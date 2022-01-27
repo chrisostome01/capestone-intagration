@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&display=swap');
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+/* hsl(202,92%,85%) */
+body{
+    position: relative;
+}
+html{
+    width: 100%;
+}
+.card-container{
+    position: relative !important;
+}
+.form-container{  
+    /* position: relative; */
+    /* top: 50%;
+    right: 50%;
+    transform: translate(50%,-50%); */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;  
+    margin: auto;
+    box-sizing: border-box;
+}
+.login .form-header{    
+    height: 100px;
+    min-width: 100%;   
+    color: var(--highlight);
+    background-color: var(--main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  
+}
+.login{
+    margin: auto;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 2px 3px 10px 5px rgba(0, 0, 0, 0.118);
+}
+.login .form-header p {
+    font-family: 'Roboto',sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 25px;
+    line-height: 47px;
+}
+.login .input-field{
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;  
+}
+form.login{
+    width: 95%;
+    display: block;
+    border-radius: 10px;
+}
+form.login input{
+    width: 85% !important;
+}
+.login .form-fields{
+    padding: 16px;
+}
+.login label{
+    color: rgba(32, 32, 32, 0.624);
+    font-family: 'Poppins' ,sans-serif;
+    font-weight: 500;
+}
+.login .input-field button{
+    margin-top: 12px;
+    width: 100%;   
+    height: 44px;
+    border:none;
+    border-radius: 5px;
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.603);
+    background-color: var(--main);
+    font-family: 'Poppins' ,sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.1s ease-in-out;
+}
+.login .input-field button:hover{   
+    color: rgb(255, 255, 255);    
+}
+.active-btn{
+    border: 1px solid var(--highlight);  
+    background-color: white;
+    color: var(--underline);
+    cursor: pointer;
+}
+.active-btn:hover{  
+    border: 1px solid var(--highlight) !important; 
+    color: var(--highlight)  !important;  
+    background-color: rgba(255, 255, 255, 0); 
+}
+.form-link a{
+    color: var(--main);
+    text-decoration: none;
+    font-family: 'Poppins' ,sans-serif;
+    font-weight: 600;
+}
+
+.form-link{
+    margin-bottom: 12px;
+}
+.icon{
+    background-color: var(--underline);
+    width: 15%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top-right-radius: 5px ;
+    border-bottom-right-radius: 5px ;
+    box-shadow: 1px 2px 4px 2px rgba(0, 0, 0, 0.268);
+    height: 44px;
+    padding: 0;
+    margin: 0;
+}
+.icon svg{
+    width:18px ;
+    height: 26px;
+}
+ .login input{
+    border-top-right-radius:0px !important;
+    border-bottom-right-radius:0px !important;
+    box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.17) !important;
+    color: #0e5394a9; 
+    font-family: 'Poppins' ,sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 16px 0px 16px 16px;
+}
+
+
+#continue-social button span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#continue-social button img{
+  max-width: 20px;
+  height: 30px;
+}
+
+#continue-social button#with-g{
+    border: 1px solid rgba(255, 193, 7, 1);
+    background-color: transparent;
+    transition: all 0.1s ease-in-out;
+}
+#continue-social button:hover#with-g{
+    background-color: rgba(255, 193, 7, 0.733);
+    transition: all 0.1s ease-in-out;
+}
+
+/* resposniveness  */
+@media screen and (min-width: 600px ) {
+    form.login{
+        width: 500px;
+        display: block;
+        border-radius: 10px;
+    }
+    .login .form-header p {
+        font-family: 'Roboto',sans-serif;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 30px;
+        line-height: 47px;
+    }
+    .login .input-field{
+        margin-bottom: 9px;       
+    }
+    .footer-section{
+        margin-top: 128px;
+    }
+    .form-container{
+        margin-top: 48px;
+    }
+    .login .form-fields{
+        padding: 32px;
+    }
+}
+@media screen and (min-width: 900px ) {
+    form.login{
+        width: 400px;
+        display: block;
+        border-radius: 10px;
+    }
+   
+}
+
+/* start:: Validation css */
+#msg{
+    display: block;
+    padding-bottom: 0px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    opacity: 0;
+    margin: 0px;
+}
+.input-field input{
+    transition: 0.2s all ease-in-out;
+}
+.input-field #msg{
+    transition: 0.2s all ease-in-out;
+}
+/* .error input{
+    box-shadow: 0px 1px 4px 2px rgba(243, 6, 6, 0.37) !important;
+}
+.success input{
+    box-shadow: 0px 1px 4px 2px rgba(7, 122, 7, 0.542) !important;
+} */
+.error .icon{
+    box-shadow: 0px 2px 4px 3px rgba(243, 6, 6, 0.438) !important;
+}
+.success .icon{
+    box-shadow: 0px 1px 4px 2px rgba(7, 122, 7, 0.542) !important;
+}
+.error #msg{    
+    color: rgba(255, 0, 0, 0.624);
+    opacity: 1 !important;
+    padding-bottom: 10px !important;
+}
+.success #msg{
+   color: rgb(18, 219, 18);
+   opacity: 1 !important;
+   padding-bottom: 10px !important;
+}
+/* End:: validation css */

@@ -1,0 +1,98 @@
+#contacts-info .comment-field{
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: left !important;
+    align-items: center;
+}
+.label-and-value{
+    width: 70%;
+}
+.label-and-value.quot{
+    width: 75%;
+}
+.label-and-value label{
+    font-weight: 900;
+    font-size: 14px;
+}
+.label-and-value span{
+    font-size: 14px;
+}
+
+.comment-main{
+    width: 70%;
+}
+.add-button {
+    height: 40px !important;
+}
+
+.r-card.image-fill{
+    min-width: 20px;
+    max-height: 100%;
+}
+.image-fill img{
+    min-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.rcard-container{
+    min-width: 100%;
+    min-height: 100%;
+    border-radius: 10px;    
+    background-color: #0a69c1e0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    color: white;
+}
+.rcard-container img{
+    width: 30px;
+    transition: all 0.2s ease-in-out;
+}
+.rcard-container:hover  {
+    background-color: #0A69C1;
+}
+.rcard-container:hover img {
+    width: 35px;
+}
+input[type=file]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+input[type=file]{
+    width: 90px;
+}
+input[type=file]::before {
+    content: 'Choose';
+    display: inline-block;
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 10pt;
+    box-shadow: var(--shadow);
+}
+input[type=file]:hover::before {
+    border-color: black;
+}
+input[type=file]:active::before {
+    background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+}
+
+.post-update-card{
+    width: 50%;
+}
+.post-card.leader{
+    width: 600px;
+}
+.add-button{
+    color: white;
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-size: 12px;
+}
