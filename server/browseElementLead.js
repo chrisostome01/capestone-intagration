@@ -30,7 +30,7 @@ const displayBlog = (inter = null) => {
 
     var blogDisplay = document.getElementById('blog-list');
     var dataPlacer = ` `;
-    fetch(`https://capstonetyu.herokuapp.com/api/v1/blogs?limit=${limit}`, {
+    fetch(`${baseUrl}api/v1/blogs?limit=${limit}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -76,12 +76,13 @@ const displayBlog = (inter = null) => {
                                                                                 <path d="M9.89214 0L5.5 3.99286L1.10786 0L0 1.00714L4.39214 5L0 8.99286L1.10786 10L5.5 6.00714L9.89214 10L11 8.99286L6.60786 5L11 1.00714L9.89214 0Z" fill="white"/>
                                                                             </svg>
                                                                         </button>` : '';
-                        dataPlacer += ` <button class="read-more" onClick="readThisBlog('${value._id}')">Read more</button>
+                        
+                     }
+                     dataPlacer += ` <button class="read-more" onClick="readThisBlog('${value._id}')">Read more</button>
                                 </div>
                             </div>
                         </div> 
                         `; 
-                     }
         });
         dataPlacer +=`<div class="more" >
           <button class="browse-more" id="next-for-new-blog" onclick="displayBlog(3)" >Browse more blog</button>

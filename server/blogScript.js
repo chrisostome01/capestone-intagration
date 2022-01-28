@@ -2,7 +2,7 @@
 window.addEventListener("load" , () => {
     var blogDisplay = document.getElementById('blogDisplay');
     var dataPlacer = ` `;
-    fetch('https://capstonetyu.herokuapp.com/api/v1/blogs', {
+    fetch(`${baseUrl}api/v1/blogs`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -1,3 +1,4 @@
+logout();
 createAccount.addEventListener('submit',(e) =>{
     showFullForm();
     e.preventDefault();
@@ -107,7 +108,7 @@ createAccount.addEventListener('submit',(e) =>{
         }   
     }     
 })
-logout();
+
 const signUpGoogle = document.getElementById('with-g');
 signUpGoogle.addEventListener('click',()=>{
     hideFullForm();

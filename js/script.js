@@ -13,16 +13,38 @@ contactForm.addEventListener('submit',(e) => {
     const isSubjectValid = isEmpty('subject','Subject');
     const isEmailValid = validateContactEmail('email');
     if(isEmailValid.pass && isSubjectValid.pass && isCommentValid.pass){
-        showNotification(`!`,'You form have been submited','success');     
-        const contactTable = database.ref('contact');
-        var uniqueId = contactTable.push().key;
-        contactTable.push().set({
-            id:uniqueId,
-            email:isEmailValid.value,
-            comment:isCommentValid.value,
-            subject:isSubjectValid.value,
-            isNew:true
+        const removeNotification =  showNotification(`!`,'You form is being processed','success',"noEnd");     
+        fetch(`${baseUrl}api/v1/contacts/send`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "comment": isCommentValid.value,
+                "email": isEmailValid.value,
+                "subject": isSubjectValid.value
+            })
         })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (response) {
+            removeNotification();
+            let status = response.status;
+            let notificationColor = 'success';
+            if(status === "Fail") notificationColor = 'error' ;
+            showNotification('!','You messsage have been sent',notificationColor);
+            
+
+        }).catch(function (response) {
+            const notificationColor = 'error';
+            removeNotification();
+            showNotification('!','Please try again sometime',notificationColor);
+          
+        });
+
+
         contactForm.reset();
     }   
 })
@@ -57,6 +79,8 @@ const addThisElement = (elementId) =>{
     document.getElementById(`${elementId}`).classList.remove('hidden');
 }
 //Getting user information
+let token = localStorage.getItem('token');
+getUserInfo(`${token}`);
 const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 /* =========== Setting blog to read ================== */
 const readThisBlog = (blogId) => {

@@ -7,32 +7,43 @@ login.addEventListener('submit',(e)=>{
     let password = document.getElementById('password').value;    
     if(isLoginInputValid.emailIsValid && isLoginInputValid.passwordIsValid){
         const removeNotification = showNotification(`!`,'Fetching your account information','success','noEnd');
-        var userInfo = {};
-       
-        auth.signInWithEmailAndPassword(email,password)
-        .then(Credentials => {
-            userTable.once("value", snap => {
-                removeNotification();
-                let userRecord = snap.val();
-                // console.log('returned record' , userRecord);
-                /* keeping user info in localstorage */ 
-                for(var i in userRecord){
-                    console.log(userRecord[i]);
-                    if(userRecord[i].Email == email ){
-                        localStorage.setItem("userInfo",JSON.stringify(userRecord[i]));
-                        location.href  = './browse.html';
-                    }
-                }
-            })
-            
-            login.reset();
-            
+    /* ============= Start:: User Logging =============== */    
+    fetch(`${baseUrl}api/v1/user/login`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "Email": email,
+            "Password": password
         })
-        .catch(error => {
-            removeNotification();
-            showNotification(`!`,error.code.split('/')[1].replace('-',' '),'error');       
-            login.reset();   
-        })     
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+       removeNotification();
+       let token = response.data.token;
+       showNotification(`!`,`You are now logged in`,'success');
+       localStorage.setItem("token",token);
+       location.href  = './browse.html';
+    }).catch(function (err) {
+       
+        removeNotification();
+        if(err.status == 401 ){
+            showNotification(`!`,`Invalid credentials`,'error');
+        }
+       if(err.status == 404 ){
+            showNotification(`!`,`Make sure you all inputs are valid`,'error');
+        }
+    });
+    /* ============== End:: User Logging ================ */    
+       
     }
     else{
         showNotification(`!`,'Please make sure all field are not empty','error');     

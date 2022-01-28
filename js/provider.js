@@ -1,3 +1,31 @@
+const baseUrl = "https://capstonetyu.herokuapp.com/";
+
+const getUserInfo = ( token ) => {
+    var USER = {} 
+    fetch(`${baseUrl}api/v1/user/find`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            'auth-token': token
+        }
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let userData =  response.data; 
+        localStorage.setItem('userInfo' , JSON.stringify(userData));
+    }).catch(function (err) {     
+        localStorage.setItem('userInfo' , null);
+    });
+
+}
+
 const showMsg = (id ,errorMsg ,status ) =>{
     let place = document.getElementById(`${id}`);
     let msgField = place.querySelector(`#msg`);
