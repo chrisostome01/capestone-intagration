@@ -33,8 +33,12 @@ contactForm.addEventListener('submit',(e) => {
             removeNotification();
             let status = response.status;
             let notificationColor = 'success';
-            if(status === "Fail") notificationColor = 'error' ;
-            showNotification('!','You messsage have been sent',notificationColor);
+            if(status === "Fail" || status === "error"  ) {
+                returnshowNotification('!',response.message,'error'); 
+            }
+            else{
+                showNotification('!','You messsage have been sent',notificationColor);
+            }
             
 
         }).catch(function (response) {
@@ -79,7 +83,7 @@ const addThisElement = (elementId) =>{
     document.getElementById(`${elementId}`).classList.remove('hidden');
 }
 //Getting user information
-let token = localStorage.getItem('token');
+const token = localStorage.getItem('token');
 getUserInfo(`${token}`);
 const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 /* =========== Setting blog to read ================== */

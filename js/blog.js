@@ -28,82 +28,102 @@ const Blogs = database.ref('Blogs');
 
 /*  ====================== Start:: Getting selected blog information ============= */
 const gettingSelectBogData = (blogIdSent) => {
-    const query = Blogs.orderByChild('id').limitToFirst(1).equalTo(blogIdSent);
-    var blogReadingSide = document.getElementById('blog-reading-side');
-    var htmlInfo = '';
-    query.on("value", function(snapshot) {
-        var data = snapshot.val();   
-        for(var i in data){           
-            htmlInfo += `
-            <div class="top-banner">
-                <img src="${data[i].postBanner}" alt="" srcset="">
-            </div>
-            <div class="blog-text">
-                <div class="blog-read-header">
-                    <h3 class="leon">${data[i].Title}</h3>
-                </div>
-                <div class="blog-read-body">
-                    <span class="sub-title">
-                        <p>
-                        ${data[i].Subtitle}
-                        </p>
-                    </span>
-                    <div class="discription" >
-                    ${data[i].info}
-                    </div>
-                </div>
-            </div>`;
-        if(userInfo != null ) 
-            htmlInfo += `<div class="voting">
-                            <div class="icons">
-                                <div class="up-vote">
-                                    <div class="up-vote-icon">
-                                        <img src="../assets/svgs/up-vote.svg" alt="" srcset="">                                                      
-                                    </div>
-                                    <div class="up-vote-counter">
-                                        <span>
-                                            12
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="divider">
-                                    <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
-                                    </svg>                                                    
-                                </div>
-                                <div class="down-vote">
-                                    <div class="down-vote-icon">
-                                        <img src="../assets/svgs/down-vote.svg" alt="">                                                                                                        
-                                    </div>
-                                    <div class="down-vote-counter">
-                                        <span>
-                                            12
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="divider">
-                                    <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
-                                    </svg>                                                    
-                                </div>
-                                <div class="comment">
-                                    <div class="comment-icon" id="commentbtn" >
-                                        <img src="../assets/svgs/comment.svg" alt="" srcset="">                                                                                                             
-                                    </div>
-                                    <div class="comment-counter">
-                                        <span>
-                                            05
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
 
-            }
-        blogReadingSide.innerHTML = htmlInfo;
-    })  
+    var blogDisplay = document.getElementById('blog-reading-side');
+    var dataPlacer = ` `;
+    fetch(`${baseUrl}api/v1/blogs/find?blogId=${blogIdSent}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        data.forEach(value => {
+                   
+                dataPlacer += `
+                <div class="top-banner">
+                    <img src="${value.postBanner}" alt="" srcset="">
+                </div>
+                <div class="blog-text">
+                    <div class="blog-read-header">
+                        <h3 class="leon">${value.Title}</h3>
+                    </div>
+                    <div class="blog-read-body">
+                        <span class="sub-title">
+                            <p>
+                            ${value.Subtitle}
+                            </p>
+                        </span>
+                        <div class="discription" >
+                        ${value.info}
+                        </div>
+                    </div>
+                </div>`;
+            if(userInfo != null ) 
+                dataPlacer += `<div class="voting">
+                                <div class="icons">
+                                    <div class="up-vote">
+                                        <div class="up-vote-icon">
+                                            <img src="../assets/svgs/up-vote.svg" alt="" srcset="">                                                      
+                                        </div>
+                                        <div class="up-vote-counter">
+                                            <span>
+                                                12
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="divider">
+                                        <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
+                                        </svg>                                                    
+                                    </div>
+                                    <div class="down-vote">
+                                        <div class="down-vote-icon">
+                                            <img src="../assets/svgs/down-vote.svg" alt="">                                                                                                        
+                                        </div>
+                                        <div class="down-vote-counter">
+                                            <span>
+                                                12
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="divider">
+                                        <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
+                                        </svg>                                                    
+                                    </div>
+                                    <div class="comment">
+                                        <div class="comment-icon" id="commentbtn" >
+                                            <img src="../assets/svgs/comment.svg" alt="" srcset="">                                                                                                             
+                                        </div>
+                                        <div class="comment-counter">
+                                            <span>
+                                                05
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+    
+               
+        });
+        blogDisplay.innerHTML = dataPlacer;
+        // removeNotification();
+    }).catch(function (err) {
+        // removeNotification();
+        console.warn('Something went wrong.', err);
+    });
 }
-// gettingSelectBogData(blogId);
+gettingSelectBogData(blogId);
 /*  ====================== End:: Getting selected blog information =============== */
 
 /* =======================Start::  Getting summary Blog info ============= */

@@ -1,4 +1,5 @@
-logout();
+// amLoggedin();
+localStorage.clear();
 login.addEventListener('submit',(e)=>{
    
     e.preventDefault();

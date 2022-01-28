@@ -370,3 +370,11 @@ function isUndifined(val) {
     return (typeof val === 'undifined');
 }
 /* =============== end:: Is it object functin====================== */
+
+/*  =============== Start:: Am logged in ========================== */
+const amLoggedin = () => {
+    let tokenAvailable = localStorage.getItem('token');
+    if(tokenAvailable) return  location.href = './blog.html';
+    return false
+}
+/* ================ End:: Am logged in ============================ */  
