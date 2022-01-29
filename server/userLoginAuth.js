@@ -1,5 +1,4 @@
 // amLoggedin();
-localStorage.clear();
 login.addEventListener('submit',(e)=>{
    
     e.preventDefault();
@@ -61,7 +60,7 @@ logInGoogle.addEventListener('click',()=>{
     auth.signInWithPopup(googleProvider)
     .then((result) => {
         const user = result.user;
-        if (result.credential) {                    
+        if (result.credential) {
             var credential = result.credential;
             var token = credential.accessToken;
         } 
