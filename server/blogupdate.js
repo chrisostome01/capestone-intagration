@@ -64,32 +64,41 @@ blogForm.addEventListener('submit' , (e) => {
            function (error) {
                console.log(error.message);
                removeNotification();
-               showNotification(`Techinical error!`,'Please try again ','error');
+               showNotification(`Techinical error!`,'Please try again, failed to upload ','error');
             },
             function () {
                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {                   
-                    //Creating a blog 
+                    //updating a blog 
                     blogForm.reset(); 
-                    var query = database.ref('Blogs').orderByChild('id').limitToFirst(1).equalTo(blogId);
-                    query.once("value", function(snapshot) { 
-                        snapshot.forEach(function(child) {
-                            console.log(child);
-                            child.ref.update({    
-                                    "Title" : title,
-                                    "Subtitle" : Subtitle, 
-                                    "info" : Information, 
-                                    "postBanner" : downloadURL
-                              }) .then(() => {
-                                  console.log('done');
-                              })  
-                              .catch(error => {
-                                  console.log(error);
-                              })
-                        });
-                        removeNotification();
-                        showNotification(`Techinical error!`,'Successfully updated','success');
-                        readThisBlog(blogId);
+                    removeNotification();
+                 
+                    fetch(`${baseUrl}api/v1/blogs/update/${blogId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'auth-token': token
+                        },
+                        body: JSON.stringify({           
+                            "Subtitle": Subtitle,
+                            "Title": title,
+                            "Description": Information,
+                            "postBanner": downloadURL
+                        }),
+                        referrer: 'no-referrer'
                     })
+                    .then(function (response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return Promise.reject(response);
+                        }
+                    })
+                    .then(function (response) {
+                        showNotification(`<i class="fas fa-bell"></i>`,'Successfully updated','success');
+                        readThisBlog(blogId);
+                    }).catch(function (err) {
+                        console.warn('Something went wrong.', err);
+                    });
                });
             } 
          );
@@ -101,25 +110,34 @@ blogForm.addEventListener('submit' , (e) => {
 
 var content = '';
 const gettingSelectBogData = (blogIdSent) => {
-    var BlogTable = database.ref('Blogs');
-    const query = BlogTable.orderByChild('id').limitToFirst(1).equalTo(blogIdSent);
     var title = document.getElementById('title');
     var Subtitle = document.getElementById('Subtitle'); 
     var textArea = document.getElementById('blog-info');    
     const blogTitle = document.getElementById("blogTitle");
 
-    query.once("value", function(snapshot) {
-        var data = snapshot.val();       
-        for(var i in data){
-            // var textArea = blogForm.querySelector('#blog-info');
-            blogTitle.innerHTML = data[i].Title;
-            title.value = data[i].Title;
-            Subtitle.value = data[i].Subtitle;  
-            content = data[i].info ;
-            
+    fetch(`${baseUrl}api/v1/blogs/find?blogId=${blogIdSent}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
         }
-    }) ;
-   
+    })
+    .then(function (response) {
+        let data = response.data;
+        blogTitle.innerHTML = data[0].Title;
+        title.value = data[0].Title;
+        Subtitle.value = data[0].Subtitle;  
+        content = data[0].info ;
+    }).catch(function (err) {    
+        console.warn('Something went wrong.', err);
+    });
 }
 gettingSelectBogData(blogId);
 window.addEventListener('load',() => { 

@@ -7,42 +7,42 @@ login.addEventListener('submit',(e)=>{
     let password = document.getElementById('password').value;    
     if(isLoginInputValid.emailIsValid && isLoginInputValid.passwordIsValid){
         const removeNotification = showNotification(`!`,'Fetching your account information','success','noEnd');
-    /* ============= Start:: User Logging =============== */    
-    fetch(`${baseUrl}api/v1/user/login`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "Email": email,
-            "Password": password
-        })
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.json();
-        } else {
-            return Promise.reject(response);
-        }
-    })
-    .then(function (response) {
-       removeNotification();
-       let token = response.data.token;
-       showNotification(`!`,`You are now logged in`,'success');
-       localStorage.setItem("token",token);
-       location.href  = './browse.html';
-    }).catch(function (err) {
-       
-        removeNotification();
-        if(err.status == 401 ){
-            showNotification(`!`,`Invalid credentials`,'error');
-        }
-       if(err.status == 404 ){
-            showNotification(`!`,`Make sure you all inputs are valid`,'error');
-        }
-    });
-    /* ============== End:: User Logging ================ */    
+        /* ============= Start:: User Logging =============== */    
+            fetch(`${baseUrl}api/v1/user/login`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "Email": email,
+                    "Password": password
+                })
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return Promise.reject(response);
+                }
+            })
+            .then(function (response) {
+                removeNotification();
+                let token = response.data.token;
+                showNotification(`!`,`You are now logged in`,'success');
+                localStorage.setItem("token",token);
+                location.href  = './browse.html';
+            })
+            .catch(function (err) {                
+                removeNotification();
+                if(err.status == 401 ){
+                    showNotification(`!`,`Invalid credentials`,'error');
+                }
+                if(err.status == 404 ){
+                    showNotification(`!`,`Make sure you all inputs are valid`,'error');
+                }
+            });
+        /* ============== End:: User Logging ================ */    
        
     }
     else{

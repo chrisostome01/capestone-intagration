@@ -49,4 +49,3 @@ window.addEventListener("load" , () => {
         console.warn('Something went wrong.', err);
     });
 })
-
