@@ -116,8 +116,6 @@ const gettingSelectBogData = (blogIdSent) => {
                                     </div>
                                 </div>
                             </div>`;
-    
-               
         });
         blogDisplay.innerHTML = dataPlacer;
         // removeNotification();

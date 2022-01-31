@@ -13,47 +13,71 @@ const getContactInfo = (limitSent =  null) => {
     var limit = limitSent == null ? limitInterval : limitSent + limitInterval;
     const contactInfo = document.getElementById('contacts-info');
     var htmlInfo = '';
-    let query = database.ref('contact').orderByChild('isNew').limitToLast(limit).equalTo(true);
-    query.once('value', (snap) => {
-        let data = snap.val();
-        for(let i in data){
-            htmlInfo += `
+    const removeNotification = showNotification(`<i class="fas fa-bell"></i>`,'Fetching queries','success','noEnd');
+    fetch(`${baseUrl}api/v1/contacts?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'auth-token': token
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        removeNotification();
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        if(response.data.length != 0){
+            showNotification(`<i class="fas fa-bell"></i>`,'Queries fetched','success');
+          
+            response.data.forEach(value => {
+                htmlInfo += `
                 <div class="cbody shodow-none content-padding">
                     <div class="set"> 
                         <div class="r-card post-card" id="postCard" >
                             <div class="user-profile " id="profile-image">
-                                <img src="../images/L8tWZT4CcVQ.jpg" id="profile-p" alt="sezerano">
+                                <img src="../assets/images/L8tWZT4CcVQ.jpg" id="profile-p" alt="sezerano">
                             </div>  
                             <div class="comment-field">
                                 <div class="label-and-value quot">
                                     <img src="../assets/svgs/quotes.svg"  alt="chrysostome" srcset="">
                                 </div>                            
                                 <div class="label-and-value">
-                                    <label for="">Email :</label> <span>${data[i].email}</span>
+                                    <label for="">Email :</label> <span>${value.email}</span>
                                 </div>
                                 <div class="label-and-value">
-                                    <label for="">Subject :</label> <span> ${data[i].subject} </span>
+                                    <label for="">Subject :</label> <span> ${value.subject}</span>
                                 </div>
                                 <div class="label-and-value">
                                     <label for="">Comment :</label>
                                     <span>  
-                                       ${data[i].comment}                               
+                                       ${value.comment}                               
                                     </span>
                                 </div>
                             </div>     
-                            <div class="add-button" id="reply" onclick="replyTo('${data[i].id}')" >
+                            <div class="add-button" id="reply" onclick="replyTo('${value._id}')" >
                                 <img src="../assets/svgs/paper-plane.svg" alt="" srcset="">
                             </div>     
                         </div>
                     </div>                      
                 </div>
                 `;
-        } 
-        if(userInfo.userType == 'admin'){
+            })
             contactInfo.innerHTML = htmlInfo;
-            document.getElementById('contact-label').classList.toggle('hidden');
-        }    
+        }
+        else{
+            showNotification(`<i class="fas fa-bell"></i>`,'No Queries found','success');
+        }
+        
+        
+    }).catch(function (err) {
+        console.warn('Something went wrong.', err);
     });
+
 }
 
 window.addEventListener('load',() => {
