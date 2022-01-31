@@ -149,7 +149,7 @@ blogForm.addEventListener('submit',(sub) => {
                             'Content-Type': 'application/json',
                             'auth-token': token
                         },
-                        body: JSON.stringify({           
+                        body: JSON.stringify({
                             "Subtitle": Subtitle,
                             "Title": title,
                             "dateCreated": date,

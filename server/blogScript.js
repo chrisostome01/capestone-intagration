@@ -30,7 +30,7 @@ window.addEventListener("load" , () => {
                     </div>
                     <div class="r-infomation">
                         <p>
-                            ${value.info}
+                            ${value.Subtitle}
                         </p>
                     </div>
                     <div class="r-card-footer">

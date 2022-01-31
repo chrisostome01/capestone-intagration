@@ -53,6 +53,52 @@ contactForm.addEventListener('submit',(e) => {
     }   
 })
 
+/* ================== Start:: subscribe ========================== */ 
+const subscribe = document.getElementById('subscribe');
+
+subscribe.addEventListener('submit' , (e) => {
+    e.preventDefault();
+    const isEmailValid = validateContactEmail('subemail');
+   
+    if(isEmailValid.pass){
+        const removeNotification =  showNotification(`<i class="fas fa-bell"></i>`,`Proccess your email`,'success' , 'noEnd');
+        fetch(`${baseUrl}api/v1/subscribers/add`,{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+                "Email" : isEmailValid.value
+            })
+        })
+        .then(response => {
+            removeNotification();
+            subscribe.reset();
+            // if(response.ok){
+                return response.json()
+            // }
+        })
+        .then(response => {
+            
+            if(response.data != null){
+                showNotification(`<i class="fas fa-bell"></i>`,'Successfully subscribed','success');
+            }
+            else{
+                showNotification(`<i class="fas fa-bell"></i>`,response.message,'error');
+            }
+
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+
+
+})
+/* ==================== End:: subscribe ========================== */ 
+
+
 //model close and open
 let close = document.getElementById('close');
 if(close != null){
