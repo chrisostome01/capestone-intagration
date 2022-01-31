@@ -52,7 +52,7 @@ login.addEventListener('submit',(e)=>{
   
 })
 
-const logInGoogle = document.getElementById('with-g');
+const logInGoogle = document.getElementById('with-gkk');
 logInGoogle.addEventListener('click',()=>{
     hidePassword();
     const removeNotification = showNotification(`!`,'Proccesing information','success','noEnd');
