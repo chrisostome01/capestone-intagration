@@ -6,7 +6,7 @@ const database = app.database();
 // send user back to browse if he or she did not provide blog
 const blogId = localStorage.getItem('blogId');
 blogId == null ? location.href = './browse.html' : '' ;
-
+var interval = 6; 
 /* ===================== Start:: Folding blog function ============================ */
 const folder = document.getElementById('folder');
 folder.addEventListener('click',() =>{
@@ -22,8 +22,9 @@ elementLeader();
 
 
 // usefull valiable
-var limitInterval = 2 ;
+var limitInterval = 3 ;
 var addToInterVal = 3 ;
+var interval = 3;
 /* =====Start Getting Db ref ======= */
 const Blogs = database.ref('Blogs');
 /* =====End Getting Db ref ======= */
@@ -130,53 +131,76 @@ gettingSelectBogData(blogId);
 
 /* =======================Start::  Getting summary Blog info ============= */
 const gettingSummaryBlog = (limitiParam = null) => {
-    var limitValues = limitiParam != null ? limitInterval : limitInterval + 1 ;
-    var query = Blogs.limitToLast(limitValues);
-    var blogSide = document.getElementById('blog-side');
-    query.on('value' , (snapshot) => {
-        var htmlInfo = '' ;
-        if(snapshot.exists()){
-            var data = snapshot.val();
-            for(var i in data){
-                htmlInfo += `
-                <div class="blog-card" onclick="revealNewBlog('${data[i].id}')" >
+    let limit = limitiParam === null ? interval : interval + limitiParam; 
+    interval = limit; 
+    const removeNotification = showNotification(`<i class="fas fa-bell"></i>`,'Fetching more blogs','success','noEnd');
+  
+
+    var blogDisplay = document.getElementById('blog-side');
+    var dataPlacer = ` `;
+    fetch(`${baseUrl}api/v1/blogs?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if(response.status == 200){
+            return response.json();  
+        }     
+        else{
+            return response
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        if(data){
+            data.forEach(value => {
+                dataPlacer += `
+                <div class="blog-card" onclick="revealNewBlog('${value._id}')" >
                     <div class="blog-summary-content">
                         <div class="blog-image-banner">
-                        <img src="${data[i].postBanner}" alt="" />
+                        <img src="${value.postBanner}" alt="" />
                         </div>
                         <div class="blog-content-s">
-                            <h3 class="leon">${data[i].Title}</h3>
+                            <h3 class="leon">${value.Title}</h3>
                             <span class="sub-title">
                                 <p>
-                                    ${data[i].Subtitle}
+                                    ${value.Subtitle}
                                 </p>
                             </span>
                             <div class="blog-info">
                                 <p>
-                                    ${data[i].info}
+                                    ${value.info}
                                 </p>                                       
                             </div>
                         </div>
                     </div>
                 </div>
                 `;
-            }
-            htmlInfo += `
+            });
+            dataPlacer += `
             <div class="next-card">
-                <div class="icon-next">
+                <div class="icon-next" onClick="gettingSummaryBlog(2)">
                     <img src="../assets/svgs/next-icon.svg" alt="" srcset="">     
                 </div>
             </div>      
             <div class="next-card-w">
-                <div class="icon-next-w">
+                <div class="icon-next-w" onClick="gettingSummaryBlog(2)">
                     <img src="../assets/svgs/next-icon-w.svg" alt="" srcset="">     
                 </div>
             </div> 
             `;
-            blogSide.innerHTML = htmlInfo;
-
+           
+            blogDisplay.innerHTML = dataPlacer;
         }
-    })
+        
+        removeNotification();
+    }).catch(function (err) {
+        removeNotification();
+        console.warn( err);
+    });
 }
 gettingSummaryBlog();
 /* =======================End::  Getting summary Blog info =============== */
@@ -245,8 +269,11 @@ const getComment = (addTo = null) =>{
             </div>
             <div class="comment-divider"></div>
         </div>`;
-        
+  
     query.on('value', (snap) =>{
+        
+
+
         let data = snap.val();
         if(snap.exists()){
             htmlInfo = ``;
