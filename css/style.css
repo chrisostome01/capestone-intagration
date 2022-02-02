@@ -39,6 +39,8 @@ html{
 }
 .highligh-f{
     color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
 }
 .highlight{
     color:var(--highlight) ;
@@ -467,10 +469,11 @@ html{
     color: var(--main);
     margin-top: 9px;
     margin-bottom: 9px;
+    font-family: 'Poppins', sans-serif;
   }
   .leader .discription p{
     font-size: 12px;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 400;
     text-align: center;
   }
