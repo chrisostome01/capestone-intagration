@@ -1,7 +1,6 @@
 
-/* Initialize Database  */
+/* Initialize firebase  */
 const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
 
 // Element Auth
 elementLeader();

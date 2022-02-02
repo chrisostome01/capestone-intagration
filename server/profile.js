@@ -1,4 +1,4 @@
-if(!isObject(userInfo) || isUndifined(userInfo) ){
+if(userInfo == 'null' ){
     location.href = './login.html';
 }
 
@@ -81,7 +81,9 @@ const getContactInfo = (limitSent =  null) => {
 }
 
 window.addEventListener('load',() => {
-    getContactInfo();
+    userInfo.userType == 'admin' ?
+        getContactInfo()
+    : '' ;    
 });
 const replyTo = (contactId) => {
     localStorage.setItem('cid',contactId);
@@ -142,5 +144,5 @@ saveProfile.addEventListener('click' , () => {
 
  
 window.addEventListener('load',() => {
-    setImage('imageToUpload',userInfo.profile);
+    setImage('imageToUpload', !userInfo.profile ? '../assets/images/profile.png' : userInfo.profile );
 })

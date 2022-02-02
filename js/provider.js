@@ -44,7 +44,7 @@ const showNotification = (title = '',msg = '',errorType = '' , lastIn = null) =>
     let place = document.getElementById(`notification`);
     let msgTitleField = place.querySelector(`#error-title`);
     let notInfo = place.querySelector(`#not-info`);
-    msgTitleField.innerHTML =  title;
+    msgTitleField.innerHTML = title;
     notInfo.innerHTML = msg  ;
     place.classList.add(`${errorType}-msg`);
     if(lastIn == null){        
@@ -331,36 +331,38 @@ const fillin = (elementId , comment) => {
 
 /* =============== Start:: Element customisation ================================= */ 
 const elementLeader = () => {
-    const comment = document.getElementById('comment-form') ;
-    if(userInfo == null){
-        const postCard = document.getElementById('postCard') ;
-        postCard != null ? postCard.remove() : '' ;
-        
-        comment != null ? comment.remove() : '' ;
-    }
-    else{
-        if(userInfo.userType != 'admin'){
-            const showBlogFormButton = document.getElementById('showBlogCreatModel') ;
-            showBlogFormButton != null ? showBlogFormButton.remove() : '' ;
+    window.addEventListener('load', () => {
+        const comment = document.getElementById('comment-form') ;
+        if(userInfo == null){
+            const postCard = document.getElementById('postCard') ;
+            postCard != null ? postCard.remove() : '' ;
+            
+            comment != null ? comment.remove() : '' ;
         }
-        comment != null ? comment.classList.toggle('hidden-comment'): '' ;
-        
-    }
-    
-    // Getting profile
-    if(userInfo != null){
-        if(userInfo.profile != null){
-            setImage('profile',userInfo.profile);
-            setImage('profile-p',userInfo.profile);
+        else{
+            if(userInfo.userType != 'admin'){
+                const showBlogFormButton = document.getElementById('showBlogCreatModel') ;
+                showBlogFormButton != null ? showBlogFormButton.remove() : '' ;
+            }
+            comment != null ? comment.classList.toggle('hidden-comment'): '' ;
+            
         }
-        addThisElement('profile-image');
-        fillin('username',userInfo.Fullname);
-        removeThisElement('loginBtn');
-        removeThisElement('signUpBtn');
-    }
-    else{
-        removeThisElement('profile-image');
-    }
+        
+        // Getting profile
+        if(userInfo != null){
+            if(userInfo.profile != null){
+                setImage('profile',userInfo.profile ? userInfo.profile : '../assets/images/profile.png');
+                setImage('profile-p',userInfo.profile ? userInfo.profile : '../assets/images/profile.png');
+            }
+            addThisElement('profile-image');
+            fillin('username',userInfo.Fullname);
+            removeThisElement('loginBtn');
+            removeThisElement('signUpBtn');
+        }
+        else{
+            removeThisElement('profile-image');
+        }
+    })  
 }
 /* =============== End:: Element customisation ================================= */ 
 /* =============== Is it object functin =========================== */
