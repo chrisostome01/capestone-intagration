@@ -1,6 +1,6 @@
 
 // send user back to browse if he or she did not provide blog
-const blogId = localStorage.getItem('blogId');
+var blogId = localStorage.getItem('blogId');
 blogId == null ? location.href = './browse.html' : '' ;
 var interval = 6; 
 /* ===================== Start:: Folding blog function ============================ */
@@ -15,6 +15,93 @@ folder.addEventListener('click',() =>{
 /* == Start::removing useful elemnt if user is not logged in */
 elementLeader();
 /* == End:: removing useful elemnt if user is not logged in */
+
+
+
+const getComment = (addTo = null) =>{
+   
+    var commentSection = document.getElementById('comment-details-section');
+    var commentInfo = '';
+    console.log(commentSection);
+    fetch(`${baseUrl}api/v1/comments?limit=${commentInteval}&q=${blogId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        
+        if(response.status == 200){
+            return response.json();  
+        }     
+        else{
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        var htmlInfo = `
+        <div class="commenters-details">
+            <div class="user-comment">       
+                <div class="user-comment-info ">
+                    <div class="comment-words success">
+                        No Comment found
+                    </div>
+                </div>
+            </div>
+            <div class="comment-divider"></div>
+        </div>`;
+
+        if(data){
+            htmlInfo = ''
+            data.forEach(value => {
+                fetch(`${baseUrl}api/v1/user/find/${value.userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token': token
+                    }
+                })
+                .then( (response) => {                  
+                    return response.json();                    
+                })
+                .then((response) => {
+                    let commenterData = response.data;
+                    let commenterProfile  = commenterData.profile;
+                    htmlInfo +=`
+                    <div class="commenters-details">
+                        <div class="user-comment">
+                            <div class="user-profile">
+                                <img src="${commenterProfile ? commenterProfile : '../assets/images/profile.png'}" id="profile"  alt="sezerano">
+                            </div>
+                            <div class="user-comment-info">
+                                <p class="leon" >${commenterData.Fullname}</p>
+                                <div class="comment-words">
+                                   ${value.comment}
+                                </div>
+                            </div>
+                        </div>                     
+                        <div class="comment-divider"></div>
+                    </div>
+                    `;
+                    commentSection.innerHTML = htmlInfo;
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            });
+            
+        }
+        
+        
+    }).catch(function (err) {     
+       showNotification('<i class="fas fa-bell"></i>',err.statusText,'error');
+    });
+
+
+}
+
 
 
 // usefull valiable
@@ -152,6 +239,7 @@ gettingSelectBogData(blogId);
 
 /* =======================Start::  Getting summary Blog info ============= */
 const gettingSummaryBlog = (limitiParam = null) => {
+    getComment();
     let limit = limitiParam === null ? interval : interval + limitiParam; 
     interval = limit; 
     const removeNotification = showNotification(`<i class="fas fa-bell"></i>`,'Fetching more blogs','success','noEnd');
@@ -227,6 +315,8 @@ gettingSummaryBlog();
 /* =======================End::  Getting summary Blog info =============== */
 /* =======================Start::  Select Blog =========================== */
 const revealNewBlog = (newBlogId) => {
+    localStorage.setItem('blogId',newBlogId);
+    blogId = localStorage.getItem('blogId');
     gettingSelectBogData(newBlogId);
 }
 /* =======================Start::  Select Blog =========================== */
@@ -289,90 +379,6 @@ postBtn.addEventListener('click' , () => {
 }
 
 
-
-const getComment = (addTo = null) =>{
-   
-    var commentSection = document.getElementById('comment-details-section');
-    var commentInfo = '';
-    console.log(commentSection);
-    fetch(`${baseUrl}api/v1/comments?limit=${commentInteval}&q=${blogId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        referrer: 'no-referrer'
-    })
-    .then(function (response) {
-        
-        if(response.status == 200){
-            return response.json();  
-        }     
-        else{
-            return Promise.reject(response);
-        }
-    })
-    .then(function (response) {
-        let data = response.data;
-        var htmlInfo = `
-        <div class="commenters-details">
-            <div class="user-comment">       
-                <div class="user-comment-info ">
-                    <div class="comment-words success">
-                        No Comment found
-                    </div>
-                </div>
-            </div>
-            <div class="comment-divider"></div>
-        </div>`;
-
-        if(data){
-            htmlInfo = ''
-            data.forEach(value => {
-                fetch(`${baseUrl}api/v1/user/find/${value.userId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'auth-token': token
-                    }
-                })
-                .then( (response) => {                  
-                    return response.json();                    
-                })
-                .then((response) => {
-                    let commenterData = response.data;
-                    let commenterProfile  = commenterData.profile;
-                    htmlInfo +=`
-                    <div class="commenters-details">
-                        <div class="user-comment">
-                            <div class="user-profile">
-                                <img src="${commenterProfile ? commenterProfile : '../assets/images/profile.png'}" id="profile"  alt="sezerano">
-                            </div>
-                            <div class="user-comment-info">
-                                <p class="leon" >${commenterData.Fullname}</p>
-                                <div class="comment-words">
-                                   ${value.comment}
-                                </div>
-                            </div>
-                        </div>                     
-                        <div class="comment-divider"></div>
-                    </div>
-                    `;
-                    commentSection.innerHTML = htmlInfo;
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-            });
-            
-        }
-        
-        
-    }).catch(function (err) {     
-       showNotification('<i class="fas fa-bell"></i>',err.statusText,'error');
-    });
-
-
-}
 
 const getMoreComment = () => {
     commentInteval++;
