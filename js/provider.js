@@ -331,7 +331,7 @@ const fillin = (elementId , comment) => {
 
 /* =============== Start:: Element customisation ================================= */ 
 const elementLeader = () => {
-    window.addEventListener('load', () => {
+    window.addEventListener('load', () => {        
         const comment = document.getElementById('comment-form') ;
         if(userInfo == null){
             const postCard = document.getElementById('postCard') ;
@@ -379,8 +379,8 @@ function isUndifined(val) {
 /*  =============== Start:: Am logged in ========================== */
 const amLoggedin = () => {
     let tokenAvailable = localStorage.getItem('token');
-    if(tokenAvailable) return  location.href = './blog.html';
-    return false
+    if(tokenAvailable) return location.href = './blog.html';
+    return false;
 }
 /* ================ End:: Am logged in ============================ */  
 
@@ -389,5 +389,6 @@ const amLoggedin = () => {
 /* ======== Start:: logging out =============== */
 const logout = () => {   
     localStorage.clear();
+    location.href = './login.html';
 }
 /* ======== Start:: logging out =============== */

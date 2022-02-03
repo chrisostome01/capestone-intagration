@@ -125,7 +125,7 @@ saveProfile.addEventListener('click' , () => {
         ()=> {
             uploading.snapshot.ref.getDownloadURL().then(function (downloadURL) {                   
                 //Updating user profile
-                fetch(`http://localhost:3500/api/v1/user/update`, {
+                fetch(`${baseUrl}api/v1/user/update`, {
                     method: 'PUT',
                     mode: 'cors',
                     headers: {

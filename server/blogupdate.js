@@ -1,5 +1,5 @@
 
-/* Initialize Database  */
+/* Initialize Firebase  */
 const app = firebase.initializeApp(firebaseConfig);
 const database = app.database();
 

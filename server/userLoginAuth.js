@@ -1,4 +1,4 @@
-// amLoggedin();
+amLoggedin();
 login.addEventListener('submit',(e)=>{
    
     e.preventDefault();
