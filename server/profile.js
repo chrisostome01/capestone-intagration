@@ -1,4 +1,4 @@
-if(userInfo == 'null' ){
+if(userInfo == 'null' || userInfo == null || userInfo == ''  ){
     location.href = './login.html';
 }
 
