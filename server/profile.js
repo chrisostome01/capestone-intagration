@@ -3,9 +3,8 @@ if(userInfo == 'null' ){
 }
 
 
-/* Initialize Database  */
+/* Initialize Firebase storage  */
 const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
 elementLeader();
 var limitInterval = 4 ;
 
@@ -75,7 +74,8 @@ const getContactInfo = (limitSent =  null) => {
         
         
     }).catch(function (err) {
-        console.warn('Something went wrong.', err);
+        showNotification(`<i class="fas fa-bell"></i>`,'You don\'t have right to this functionality','error');
+      
     });
 
 }
@@ -124,21 +124,49 @@ saveProfile.addEventListener('click' , () => {
         },
         ()=> {
             uploading.snapshot.ref.getDownloadURL().then(function (downloadURL) {                   
-                //Creating a blog 
-                var query = database.ref('users').orderByChild('id').limitToFirst(1).equalTo(uniqueid);
-                query.once('value',(snap) => {
-                    snap.forEach(child => {
-                        child.ref.update({
-                            profile: downloadURL
-                        })
-                    });
-                    location.href = './login.html';
+                //Updating user profile
+                fetch(`http://localhost:3500/api/v1/user/update`, {
+                    method: 'PUT',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token' : token
+                    },
+                    body: JSON.stringify({
+                        "profile": downloadURL,
+                    })
+                })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        return Promise.reject(response);
+                    }
+                })
+                .then(function (response) {
+                    removeNotification();
+                    showNotification(`!`,`Your profile have been updated`,'success');
+                    setImage('imageToUpload', downloadURL );
+                })
+                .catch(function (err) {                
+                    removeNotification();
+                    if(err.status == 401 ){
+                        localStorage.setItem('token' , null);
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Invalid credentials`,'error');
+                    }
+                    if(err.status == 404 ){
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Make sure you all inputs are valid`,'error');
+                    }
+                    if(err.status == 204 ){
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Please login again`,'error');
+                        
+                    }
                 });
            });
         });
     }
     else{
-        showNotification(`!`,'Please make sure you have selected image','error');
+        showNotification(`<i class="fas fa-bell" > </i>`,'Please make sure you have selected image','error');
     }
 })
 

@@ -33,7 +33,7 @@ login.addEventListener('submit',(e)=>{
                 localStorage.setItem("token",token);
                 location.href  = './browse.html';
             })
-            .catch(function (err) {                
+            .catch(function (err) {
                 removeNotification();
                 if(err.status == 401 ){
                     showNotification(`!`,`Invalid credentials`,'error');

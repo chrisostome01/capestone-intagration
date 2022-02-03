@@ -316,6 +316,7 @@ html{
   }
   .leon{
     color: var(--main);
+    cursor: pointer;
   }
   .title .leon{
     width:100% ;

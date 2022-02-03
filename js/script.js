@@ -132,6 +132,7 @@ const addThisElement = (elementId) =>{
 const token = localStorage.getItem('token');
 getUserInfo(`${token}`);
 const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
 /* =========== Setting blog to read ================== */
 const readThisBlog = (blogId) => {
     localStorage.setItem("blogId",blogId);

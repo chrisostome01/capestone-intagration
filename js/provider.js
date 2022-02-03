@@ -383,3 +383,11 @@ const amLoggedin = () => {
     return false
 }
 /* ================ End:: Am logged in ============================ */  
+
+
+
+/* ======== Start:: logging out =============== */
+const logout = () => {   
+    localStorage.clear();
+}
+/* ======== Start:: logging out =============== */
