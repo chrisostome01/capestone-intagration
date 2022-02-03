@@ -108,6 +108,7 @@ saveProfile.addEventListener('click' , () => {
     const imageInput = document.getElementById('newImage');
     const imageToUpload = document.getElementById('imageToUpload');
     var singleFile = imageInput.files[0];
+   
     if(singleFile != null){
         var image = imageInput.files[0];
         var imageName = image.name;
@@ -116,6 +117,7 @@ saveProfile.addEventListener('click' , () => {
         var uploading = storageRef.put(image);
         uploading.on('state_changed',
         (snapshot)=> {
+            const removeNotification = showNotification(`<i class="fas fa-bell" >`,`Uploading your profile`,'success');
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("upload is " + progress + " done");
         },
@@ -137,6 +139,7 @@ saveProfile.addEventListener('click' , () => {
                     })
                 })
                 .then(function (response) {
+                    removeNotification()
                     if (response.ok) {
                         return response.json();
                     } else {
@@ -144,12 +147,10 @@ saveProfile.addEventListener('click' , () => {
                     }
                 })
                 .then(function (response) {
-                    removeNotification();
                     showNotification(`!`,`Your profile have been updated`,'success');
                     setImage('imageToUpload', downloadURL );
                 })
-                .catch(function (err) {                
-                    removeNotification();
+                .catch(function (err) { 
                     if(err.status == 401 ){
                         localStorage.setItem('token' , null);
                         showNotification(`<i class="fas fa-bell" > </i>`,`Invalid credentials`,'error');
