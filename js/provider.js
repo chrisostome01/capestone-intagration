@@ -1,3 +1,34 @@
+const baseUrl = "https://capstonetyu.herokuapp.com/";
+
+const getUserInfo = ( token ) => {
+    var USER = {} 
+    if(token != 'null'){
+        fetch(`${baseUrl}api/v1/user/find`, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': token
+            }
+        })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return Promise.reject(response);
+            }
+        })
+        .then(function (response) {
+            let userData =  response.data; 
+            localStorage.setItem('userInfo' , JSON.stringify(userData));
+        }).catch(function (err) {     
+            localStorage.setItem('userInfo' , null);
+        });
+    }
+  
+
+}
+
 const showMsg = (id ,errorMsg ,status ) =>{
     let place = document.getElementById(`${id}`);
     let msgField = place.querySelector(`#msg`);
@@ -13,7 +44,7 @@ const showNotification = (title = '',msg = '',errorType = '' , lastIn = null) =>
     let place = document.getElementById(`notification`);
     let msgTitleField = place.querySelector(`#error-title`);
     let notInfo = place.querySelector(`#not-info`);
-    msgTitleField.innerHTML =  title;
+    msgTitleField.innerHTML = title;
     notInfo.innerHTML = msg  ;
     place.classList.add(`${errorType}-msg`);
     if(lastIn == null){        
@@ -300,36 +331,38 @@ const fillin = (elementId , comment) => {
 
 /* =============== Start:: Element customisation ================================= */ 
 const elementLeader = () => {
-    const comment = document.getElementById('comment-form') ;
-    if(userInfo == null){
-        const postCard = document.getElementById('postCard') ;
-        postCard != null ? postCard.remove() : '' ;
-        
-        comment != null ? comment.remove() : '' ;
-    }
-    else{
-        if(userInfo.userType != 'admin'){
-            const showBlogFormButton = document.getElementById('showBlogCreatModel') ;
-            showBlogFormButton != null ? showBlogFormButton.remove() : '' ;
+    window.addEventListener('load', () => {        
+        const comment = document.getElementById('comment-form') ;
+        if(userInfo == null){
+            const postCard = document.getElementById('postCard') ;
+            postCard != null ? postCard.remove() : '' ;
+            
+            comment != null ? comment.remove() : '' ;
         }
-        comment != null ? comment.classList.toggle('hidden-comment'): '' ;
-        
-    }
-    
-    // Getting profile
-    if(userInfo != null){
-        if(userInfo.profile != null){
-            setImage('profile',userInfo.profile);
-            setImage('profile-p',userInfo.profile);
+        else{
+            if(userInfo.userType != 'admin'){
+                const showBlogFormButton = document.getElementById('showBlogCreatModel') ;
+                showBlogFormButton != null ? showBlogFormButton.remove() : '' ;
+            }
+            comment != null ? comment.classList.toggle('hidden-comment'): '' ;
+            
         }
-        addThisElement('profile-image');
-        fillin('username',userInfo.Fullname);
-        removeThisElement('loginBtn');
-        removeThisElement('signUpBtn');
-    }
-    else{
-        removeThisElement('profile-image');
-    }
+        
+        // Getting profile
+        if(userInfo != null){
+            if(userInfo.profile != null){
+                setImage('profile',userInfo.profile ? userInfo.profile : '../assets/images/profile.png');
+                setImage('profile-p',userInfo.profile ? userInfo.profile : '../assets/images/profile.png');
+            }
+            addThisElement('profile-image');
+            fillin('username',userInfo.Fullname);
+            removeThisElement('loginBtn');
+            removeThisElement('signUpBtn');
+        }
+        else{
+            removeThisElement('profile-image');
+        }
+    })  
 }
 /* =============== End:: Element customisation ================================= */ 
 /* =============== Is it object functin =========================== */
@@ -342,3 +375,20 @@ function isUndifined(val) {
     return (typeof val === 'undifined');
 }
 /* =============== end:: Is it object functin====================== */
+
+/*  =============== Start:: Am logged in ========================== */
+const amLoggedin = () => {
+    let tokenAvailable = localStorage.getItem('token');
+    if(tokenAvailable) return location.href = './blog.html';
+    return false;
+}
+/* ================ End:: Am logged in ============================ */  
+
+
+
+/* ======== Start:: logging out =============== */
+const logout = () => {   
+    localStorage.clear();
+    location.href = './login.html';
+}
+/* ======== Start:: logging out =============== */

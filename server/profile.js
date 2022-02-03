@@ -1,11 +1,10 @@
-if(!isObject(userInfo) || isUndifined(userInfo) ){
+if(userInfo == 'null' ){
     location.href = './login.html';
 }
 
 
-/* Initialize Database  */
+/* Initialize Firebase storage  */
 const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
 elementLeader();
 var limitInterval = 4 ;
 
@@ -13,51 +12,78 @@ const getContactInfo = (limitSent =  null) => {
     var limit = limitSent == null ? limitInterval : limitSent + limitInterval;
     const contactInfo = document.getElementById('contacts-info');
     var htmlInfo = '';
-    let query = database.ref('contact').orderByChild('isNew').limitToLast(limit).equalTo(true);
-    query.once('value', (snap) => {
-        let data = snap.val();
-        for(let i in data){
-            htmlInfo += `
+    const removeNotification = showNotification(`<i class="fas fa-bell"></i>`,'Fetching queries','success','noEnd');
+    fetch(`${baseUrl}api/v1/contacts?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'auth-token': token
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        removeNotification();
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        if(response.data.length != 0){
+            showNotification(`<i class="fas fa-bell"></i>`,'Queries fetched','success');
+          
+            response.data.forEach(value => {
+                htmlInfo += `
                 <div class="cbody shodow-none content-padding">
                     <div class="set"> 
                         <div class="r-card post-card" id="postCard" >
                             <div class="user-profile " id="profile-image">
-                                <img src="../images/L8tWZT4CcVQ.jpg" id="profile-p" alt="sezerano">
+                                <img src="../assets/images/L8tWZT4CcVQ.jpg" id="profile-p" alt="sezerano">
                             </div>  
                             <div class="comment-field">
                                 <div class="label-and-value quot">
                                     <img src="../assets/svgs/quotes.svg"  alt="chrysostome" srcset="">
                                 </div>                            
                                 <div class="label-and-value">
-                                    <label for="">Email :</label> <span>${data[i].email}</span>
+                                    <label for="">Email :</label> <span>${value.email}</span>
                                 </div>
                                 <div class="label-and-value">
-                                    <label for="">Subject :</label> <span> ${data[i].subject} </span>
+                                    <label for="">Subject :</label> <span> ${value.subject}</span>
                                 </div>
                                 <div class="label-and-value">
                                     <label for="">Comment :</label>
                                     <span>  
-                                       ${data[i].comment}                               
+                                       ${value.comment}                               
                                     </span>
                                 </div>
                             </div>     
-                            <div class="add-button" id="reply" onclick="replyTo('${data[i].id}')" >
+                            <div class="add-button" id="reply" onclick="replyTo('${value._id}')" >
                                 <img src="../assets/svgs/paper-plane.svg" alt="" srcset="">
                             </div>     
                         </div>
                     </div>                      
                 </div>
                 `;
-        } 
-        if(userInfo.userType == 'admin'){
+            })
             contactInfo.innerHTML = htmlInfo;
-            document.getElementById('contact-label').classList.toggle('hidden');
-        }    
+        }
+        else{
+            showNotification(`<i class="fas fa-bell"></i>`,'No Queries found','success');
+        }
+        
+        
+    }).catch(function (err) {
+        showNotification(`<i class="fas fa-bell"></i>`,'You don\'t have right to this functionality','error');
+      
     });
+
 }
 
 window.addEventListener('load',() => {
-    getContactInfo();
+    userInfo.userType == 'admin' ?
+        getContactInfo()
+    : '' ;    
 });
 const replyTo = (contactId) => {
     localStorage.setItem('cid',contactId);
@@ -82,6 +108,7 @@ saveProfile.addEventListener('click' , () => {
     const imageInput = document.getElementById('newImage');
     const imageToUpload = document.getElementById('imageToUpload');
     var singleFile = imageInput.files[0];
+   
     if(singleFile != null){
         var image = imageInput.files[0];
         var imageName = image.name;
@@ -90,6 +117,7 @@ saveProfile.addEventListener('click' , () => {
         var uploading = storageRef.put(image);
         uploading.on('state_changed',
         (snapshot)=> {
+            const removeNotification = showNotification(`<i class="fas fa-bell" >`,`Uploading your profile`,'success');
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("upload is " + progress + " done");
         },
@@ -98,25 +126,52 @@ saveProfile.addEventListener('click' , () => {
         },
         ()=> {
             uploading.snapshot.ref.getDownloadURL().then(function (downloadURL) {                   
-                //Creating a blog 
-                var query = database.ref('users').orderByChild('id').limitToFirst(1).equalTo(uniqueid);
-                query.once('value',(snap) => {
-                    snap.forEach(child => {
-                        child.ref.update({
-                            profile: downloadURL
-                        })
-                    });
-                    location.href = './login.html';
+                //Updating user profile
+                fetch(`${baseUrl}api/v1/user/update`, {
+                    method: 'PUT',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token' : token
+                    },
+                    body: JSON.stringify({
+                        "profile": downloadURL,
+                    })
+                })
+                .then(function (response) {
+                    removeNotification()
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        return Promise.reject(response);
+                    }
+                })
+                .then(function (response) {
+                    showNotification(`!`,`Your profile have been updated`,'success');
+                    setImage('imageToUpload', downloadURL );
+                })
+                .catch(function (err) { 
+                    if(err.status == 401 ){
+                        localStorage.setItem('token' , null);
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Invalid credentials`,'error');
+                    }
+                    if(err.status == 404 ){
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Make sure you all inputs are valid`,'error');
+                    }
+                    if(err.status == 204 ){
+                        showNotification(`<i class="fas fa-bell" > </i>`,`Please login again`,'error');
+                        
+                    }
                 });
            });
         });
     }
     else{
-        showNotification(`!`,'Please make sure you have selected image','error');
+        showNotification(`<i class="fas fa-bell" > </i>`,'Please make sure you have selected image','error');
     }
 })
 
  
 window.addEventListener('load',() => {
-    setImage('imageToUpload',userInfo.profile);
+    setImage('imageToUpload', !userInfo.profile ? '../assets/images/profile.png' : userInfo.profile );
 })

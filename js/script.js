@@ -13,19 +13,91 @@ contactForm.addEventListener('submit',(e) => {
     const isSubjectValid = isEmpty('subject','Subject');
     const isEmailValid = validateContactEmail('email');
     if(isEmailValid.pass && isSubjectValid.pass && isCommentValid.pass){
-        showNotification(`!`,'You form have been submited','success');     
-        const contactTable = database.ref('contact');
-        var uniqueId = contactTable.push().key;
-        contactTable.push().set({
-            id:uniqueId,
-            email:isEmailValid.value,
-            comment:isCommentValid.value,
-            subject:isSubjectValid.value,
-            isNew:true
+        const removeNotification =  showNotification(`!`,'You form is being processed','success',"noEnd");     
+        fetch(`${baseUrl}api/v1/contacts/send`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "comment": isCommentValid.value,
+                "email": isEmailValid.value,
+                "subject": isSubjectValid.value
+            })
         })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (response) {
+            removeNotification();
+            let status = response.status;
+            let notificationColor = 'success';
+            if(status === "Fail" || status === "error"  ) {
+                returnshowNotification('!',response.message,'error'); 
+            }
+            else{
+                showNotification('!','You messsage have been sent',notificationColor);
+            }
+            
+
+        }).catch(function (response) {
+            const notificationColor = 'error';
+            removeNotification();
+            showNotification('!','Please try again sometime',notificationColor);
+          
+        });
+
+
         contactForm.reset();
     }   
 })
+
+/* ================== Start:: subscribe ========================== */ 
+const subscribe = document.getElementById('subscribe');
+
+subscribe.addEventListener('submit' , (e) => {
+    e.preventDefault();
+    const isEmailValid = validateContactEmail('subemail');
+   
+    if(isEmailValid.pass){
+        const removeNotification =  showNotification(`<i class="fas fa-bell"></i>`,`Proccess your email`,'success' , 'noEnd');
+        fetch(`${baseUrl}api/v1/subscribers/add`,{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+                "Email" : isEmailValid.value
+            })
+        })
+        .then(response => {
+            removeNotification();
+            subscribe.reset();
+            // if(response.ok){
+                return response.json()
+            // }
+        })
+        .then(response => {
+            
+            if(response.data != null){
+                showNotification(`<i class="fas fa-bell"></i>`,'Successfully subscribed','success');
+            }
+            else{
+                showNotification(`<i class="fas fa-bell"></i>`,response.message,'error');
+            }
+
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+
+
+})
+/* ==================== End:: subscribe ========================== */ 
+
 
 //model close and open
 let close = document.getElementById('close');
@@ -57,7 +129,10 @@ const addThisElement = (elementId) =>{
     document.getElementById(`${elementId}`).classList.remove('hidden');
 }
 //Getting user information
+const token = localStorage.getItem('token');
+getUserInfo(`${token}`);
 const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
 /* =========== Setting blog to read ================== */
 const readThisBlog = (blogId) => {
     localStorage.setItem("blogId",blogId);

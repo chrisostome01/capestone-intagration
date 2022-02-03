@@ -83,9 +83,11 @@
         width: 290px; 
     }
 }
+
+
 @media screen and (min-width:1024px) {    
     .r-card{
-        width: 230px;  
+        width: 220px;  
         max-height: 712px;
     }
     .content-padding{
@@ -94,6 +96,18 @@
     }
     .more{
         width: 92%;
+    }
+}
+
+@media screen and (min-width:1100px) {    
+    .r-card{
+        width: 210px;  
+        max-height: 712px;
+        background-color: red !important;
+    }
+    .content-padding{
+        padding-left: 90px;
+        padding-right: 90px;
     }
 }
 
@@ -115,7 +129,7 @@
 }
 @media screen and (min-width:1090px) {    
     .r-card{
-        width: 250px;  
+        width: 230px;  
         max-height: 712px;
     }
     
@@ -131,7 +145,7 @@
 }
 @media screen and (min-width:1200px) {    
     .r-card{
-        width: 300px;  
+        width: 270px;  
         max-height: 712px;
     }   
 }

@@ -1,3 +1,4 @@
+logout();
 createAccount.addEventListener('submit',(e) =>{
     showFullForm();
     e.preventDefault();
@@ -15,100 +16,44 @@ createAccount.addEventListener('submit',(e) =>{
             let password = document.getElementById('password').value;
             let fullname = document.getElementById('Fullname').value;
             let username = document.getElementById('username').value;
-            auth.createUserWithEmailAndPassword(email ,password)
-            .then((userCredential) => {
-                const user = userCredential.user;  
-                const isNewEmail = userCredential.additionalUserInfo.isNewUser; 
-                const id = userTable.push().key;
-                console.log(user);
-                removeNotification();
-                if(isNewEmail){
-                    userTable.child(user.uid).set({
-                        'id' :  user.uid ,
-                        'Fullname' : fullname,
-                        'Email' : email,
-                        'Username' : username,
-                        'emailIsVerified' : false,
-                        'profile' : user.photoURL,
-                        'parentId' : id,
-                        'userType' : 'normal',
-                        'longitude':longitudei,
-                        'latitude':latitudei
-                    });
-                    var userInfo = { };
-                    userTable.once("value", snap => {
-                        let userRecord = snap.val();
-                        /* keeping user info in localstorage */ 
-                        for(var i in userRecord){
-                            console.log(userRecord[i]);
-                            if(userRecord[i].Email == email ){
-                                localStorage.setItem("userInfo",JSON.stringify(userRecord[i]));
-                                location.href  = './browse.html';
-                            }
-                        }
-                    })
-                    
-                    createAccount.reset();
+             /* ============= Start:: User Logging =============== */    
+            fetch(`${baseUrl}api/v1/user/register`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "Username" : username,
+                    "password" : password,
+                    "Email" : email,
+                    "Fullname" : fullname
+                })
+            })
+            .then(function (response) {
+                removeNotification();              
+                return response.json();
+                
+            })
+            .then(function (response) {
+                if(response.data != null){
+                    showNotification(`<i class="fas fa-bell"></i>`,response.message,'success');
+                    location.href  = './login.html';
                 }
                 else{
-                    showNotification(`!`,'You email is already sign up','success');
+                    showNotification(`<i class="fas fa-bell"></i>`,response.message,'error');
+                    
                 }
-            }) 
-            .catch((error) => {
-                console.log(error);
+            })
+            .catch(function (err) {  
+                showNotification('<i class="fas fa-bell"></i>',err.message, 'error')
             });
+        /* ============== End:: User Logging ================ */    
         }   
     }    
-    else{
-        
-        if(isSignupInputValid.emailIsValid && isSignupInputValid.passwordIsValid && isSignupInputValid.userNameIsValid && isSignupInputValid.fullNameIsValid){
-            let email = document.getElementById('Email').value;
-            let password = document.getElementById('password').value;
-            let fullname = document.getElementById('Fullname').value;
-            let username = document.getElementById('username').value;
-            auth.createUserWithEmailAndPassword(email ,password)
-            .then((userCredential) => {
-                const user = userCredential.user;  
-                const isNewEmail = userCredential.additionalUserInfo.isNewUser; 
-                const id = userTable.push().key;
-                console.log(user);
-                if(isNewEmail){
-                    userTable.child(user.uid).set({
-                        'id' :  user.uid ,
-                        'Fullname' : fullname,
-                        'Email' : email,
-                        'Username' : username,
-                        'emailIsVerified' : false,
-                        'profile' : user.photoURL,
-                        'parentId' : id,
-                        'userType' : 'normal',
-                        'longitude':longitudei,
-                        'latitude':latitudei
-                    });
-                    var userInfo = { };
-                    userTable.once("value", snap => {
-                        let userRecord = snap.val();
-                        /* keeping user info in localstorage */ 
-                        for(var i in userRecord){
-                            console.log(userRecord[i]);
-                            if(userRecord[i].Email == email ){
-                                localStorage.setItem("userInfo",JSON.stringify(userRecord[i]));
-                                location.href  = './browse.html';
-                            }
-                        }
-                    })
-                    
-                    createAccount.reset();
-                }
-            }) 
-            .catch((error) => {
-                console.log(error);
-            });
-        }   
-    }     
 })
-logout();
-const signUpGoogle = document.getElementById('with-g');
+
+const signUpGoogle = document.getElementById('with-gkk');
 signUpGoogle.addEventListener('click',()=>{
     hideFullForm();
     var latitudei = 0000;

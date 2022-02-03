@@ -1,13 +1,12 @@
 
-/* Initialize Database  */
+/* Initialize firebase  */
 const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
 
 // Element Auth
 elementLeader();
 
 // usefull varible
-var interval = 9;
+var interval = 6;
 
 
 // initializing tinmyce
@@ -20,69 +19,82 @@ tinymce.init({
     tinycomments_mode: 'embedded',
   });
 // function for showing blog
+
 const bloglist = document.getElementById("blog-list");
 const displayBlog = (inter = null) => {
-    let limit = interval === null ? interval : interval + inter;
-    var BlogTable = database.ref('Blogs').orderByChild("dateCreated").limitToLast(limit);
+    let limit = inter === null ? interval : interval + inter; 
+    interval = limit; 
     const removeNotification = showNotification(`!`,'Fetching blogs','success','noEnd');
-    var htmlString = '';
-    bloglist.innerHTML = '';
-    BlogTable.on('value', (snapshot) => {
-        const data = snapshot.val();
-        bloglist.innerHTML = '';
-        if (snapshot.exists()) {
-            removeNotification();
-            showNotification(`!`,'Blogs fetched','success');
-            var childKey = snapshot.key;
-            for(var i in data){
-                // console.log(data[i]);
-                htmlString += `
+  
+
+    var blogDisplay = document.getElementById('blog-list');
+    var dataPlacer = ` `;
+    fetch(`${baseUrl}api/v1/blogs?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if(response.status == 200){
+            return response.json();  
+        }     
+        else{
+            return response
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        if(data){
+            data.forEach(value => {
+                dataPlacer += `
                 <div class="r-card">
                     <div class="top-image">
-                        <img src="${data[i].postBanner}" alt="" srcset="">
+                        <img src="${value.postBanner}" alt="" srcset="">
                     </div>
                     <div class="r-card-body">
                         <div class="r-card-title ">
-                            <h5 class="leon" >${ellpsIt(data[i].Title,35)}</h5>
+                            <h5 class="leon" >${ellpsIt(value.Title,35)}</h5>
                         </div>
                         <div class="r-infomation">
                             <p>
-                                ${ellpsIt(data[i].Subtitle,70)}
+                                ${ellpsIt(value.Subtitle,70)}
                             </p>
                         </div> 
-                        `
+                        `  
                         if(userInfo != null ) {
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? `<div class="r-card-footer flexed-footer">`:`<div class="r-card-footer">`;
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more update"  onClick="updateThisBlog('${data[i].id}')">
+                            dataPlacer += userInfo.userType != null && userInfo.userType == 'admin' ? `<div class="r-card-footer flexed-footer">`:`<div class="r-card-footer">`;
+                            dataPlacer += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more update"  onClick="updateThisBlog('${value._id}')">
                                                                             <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                                 <path d="M4.29163 10.4243L6.682 10.4155L11.8993 4.85051C12.1041 4.63001 12.2167 4.33718 12.2167 4.02568C12.2167 3.71418 12.1041 3.42135 11.8993 3.20085L11.0402 2.27568C10.6307 1.83468 9.91629 1.83701 9.51004 2.27393L4.29163 7.8401V10.4243V10.4243ZM10.2743 3.10051L11.135 4.02393L10.27 4.94676L9.41092 4.02218L10.2743 3.10051ZM5.37496 8.3266L8.64121 4.84235L9.50029 5.76751L6.23458 9.2506L5.37496 9.25351V8.3266Z" fill="white"/>
                                                                                 <path d="M3.20833 12.75H10.7917C11.3891 12.75 11.875 12.2267 11.875 11.5833V6.527L10.7917 7.69367V11.5833H4.91892C4.90483 11.5833 4.89021 11.5892 4.87613 11.5892C4.85825 11.5892 4.84038 11.5839 4.82196 11.5833H3.20833V3.41667H6.91713L8.00046 2.25H3.20833C2.61087 2.25 2.125 2.77325 2.125 3.41667V11.5833C2.125 12.2267 2.61087 12.75 3.20833 12.75Z" fill="white"/>
                                                                             </svg> 
                                                                             </button>` : '';
-
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more delete"  onClick="deleteThisBlog('${data[i].id}')">
+    
+                            dataPlacer += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more delete"  onClick="deleteThisBlog('${value._id}')">
                                                                                 <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                                     <path d="M9.89214 0L5.5 3.99286L1.10786 0L0 1.00714L4.39214 5L0 8.99286L1.10786 10L5.5 6.00714L9.89214 10L11 8.99286L6.60786 5L11 1.00714L9.89214 0Z" fill="white"/>
                                                                                 </svg>
                                                                             </button>` : '';
-                      
+                            
                          }
-                      
-                        htmlString += ` <button class="read-more" onClick="readThisBlog('${data[i].id}')">Read more</button>
-                        </div>
-                    </div>
-                </div> 
-                `; 
-            }
-            htmlString +=`<div class="more" >
-                            <button class="browse-more" id="next-for-new-blog" onclick="displayBlog(3)" >Browse more blog</button>
-                        </div>`;
-            bloglist.innerHTML= htmlString;
-        }        
-        else{
-            showNotification(`!`,'No blogs found','error');
+                         dataPlacer += ` <button class="read-more" onClick="readThisBlog('${value._id}')">Read more</button>
+                                    </div>
+                                </div>
+                            </div> 
+                            `; 
+            });
+            dataPlacer +=`<div class="more" >
+              <button class="browse-more" id="next-for-new-blog" onclick="displayBlog(3)" >Browse more blog</button>
+            </div>`;
+            blogDisplay.innerHTML = dataPlacer;
         }
+        
         removeNotification();
+    }).catch(function (err) {
+        removeNotification();
+        console.warn( err);
     });
 }
 displayBlog();
@@ -90,9 +102,7 @@ displayBlog();
 const blogForm = document.getElementById('new-blog-form');
 blogForm.addEventListener('submit',(sub) => {
     sub.preventDefault();
-    var BlogTable = database.ref('Blogs');
     // getting unique id
-    const uniqueid = BlogTable.push().key;
     const imagefield = document.getElementById("image");
     if(imagefield.value.trim() == ''){
         showNotification(`image!`,'You have to select image','error');
@@ -110,7 +120,7 @@ blogForm.addEventListener('submit',(sub) => {
          // gettinng information from input
         var image = document.getElementById("image").files[0];
         var imageName = image.name;
-        var storageRef = firebase.storage().ref("images/"+uniqueid+"/"+ imageName);
+        var storageRef = firebase.storage().ref("images/"+ imageName);
         var uploadTask = storageRef.put(image);
         let title = blogForm.querySelector('#title').value;
         let Subtitle = blogForm.querySelector('#Subtitle').value;
@@ -126,26 +136,57 @@ blogForm.addEventListener('submit',(sub) => {
               },
               function () {
                 uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    
+                 const removeNotification =   showNotification('!','Uploading the image ','success',"noEnd");
                 // getting date 
                 const today = new Date();
                 const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate() + " " + today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(); ;
-                //Createing a blog
-                BlogTable.push().set({
-                    "id" : uniqueid ,
-                    "creatorId": userInfo.id,
-                    "Title" : title,
-                    "Subtitle" : Subtitle,
-                    "dateCreated":date,
-                    "info" : Information,
-                    "rate" : 1,
-                    "postBanner" : downloadURL
-                });
-                document.getElementById('blog-model').classList.remove('blog-active');
-                showNotification(`!`,'Fetched','success');
-                displayBlog();
-                blogForm.reset(); 
+                /* ========== Start:: Adding blogs ============ */
+                    fetch(`${baseUrl}api/v1/blogs/create`, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'auth-token': token
+                        },
+                        body: JSON.stringify({
+                            "Subtitle": Subtitle,
+                            "Title": title,
+                            "dateCreated": date,
+                            "Description": Information,
+                            "postBanner": downloadURL
+                        })
+                    })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (response) {
+                        removeNotification();
+                        let status = response.status;
+                        console.log(response);
+                        let notificationColor = 'success';                        
+                        if(status === "Fail" || status === "error"  ) {
+                            showNotification('!',response.message,'error'); 
+                        }
+                        else{
+                            showNotification('!',response.message,notificationColor);
+                            displayBlog();
+                        }
+            
+                    }).catch(function (response) {
+                        const notificationColor = 'error';
+                        removeNotification();
+                        showNotification('!','Please try again sometime',notificationColor);
                     
+                    });
+                /* ========== End:: Adding blog  ============= */ 
+               
+                blogForm.reset(); 
+                
+                showNotification(`!`,'Fetching','success');
+                document.getElementById('blog-model').classList.remove('blog-active');
+                
+               
+               
                 });
               }
           
@@ -153,84 +194,78 @@ blogForm.addEventListener('submit',(sub) => {
     }
 })
 
-const fetchBlogs = () => {
-    var BlogTable = database.ref('Blogs').orderByChild("dateCreated").limitToLast(interval);
-    var htmlString = '';
-  
-    BlogTable.once('value', (snapshot) => {
-        bloglist.innerHTML = '';
-        const data = snapshot.val();
-        if (snapshot.exists()) {
-            showNotification(`!`,'Blogs fetched','success');
-            var childKey = snapshot.key;
-            for(var i in data){
-                console.log(data[i]);
-                 htmlString += `
-                <div class="r-card">
-                    <div class="top-image">
-                        <img src="${data[i].postBanner}" alt="" srcset="">
-                    </div>
-                    <div class="r-card-body">
-                    <div class="r-card-title ">
-                        <h5 class="leon" >${ellpsIt(data[i].Title,35)}</h5>
-                    </div>
-                    <div class="r-infomation">
-                        <p>
-                            ${ellpsIt(data[i].Subtitle,70)}
-                        </p>
-                    </div> 
-                        `
-                        if(userInfo != null ) {
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? `<div class="r-card-footer flexed-footer">`:`<div class="r-card-footer">`;
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more update"  onClick="updateThisBlog('${data[i].id}')">
-                                                                            <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path d="M4.29163 10.4243L6.682 10.4155L11.8993 4.85051C12.1041 4.63001 12.2167 4.33718 12.2167 4.02568C12.2167 3.71418 12.1041 3.42135 11.8993 3.20085L11.0402 2.27568C10.6307 1.83468 9.91629 1.83701 9.51004 2.27393L4.29163 7.8401V10.4243V10.4243ZM10.2743 3.10051L11.135 4.02393L10.27 4.94676L9.41092 4.02218L10.2743 3.10051ZM5.37496 8.3266L8.64121 4.84235L9.50029 5.76751L6.23458 9.2506L5.37496 9.25351V8.3266Z" fill="white"/>
-                                                                                <path d="M3.20833 12.75H10.7917C11.3891 12.75 11.875 12.2267 11.875 11.5833V6.527L10.7917 7.69367V11.5833H4.91892C4.90483 11.5833 4.89021 11.5892 4.87613 11.5892C4.85825 11.5892 4.84038 11.5839 4.82196 11.5833H3.20833V3.41667H6.91713L8.00046 2.25H3.20833C2.61087 2.25 2.125 2.77325 2.125 3.41667V11.5833C2.125 12.2267 2.61087 12.75 3.20833 12.75Z" fill="white"/>
-                                                                            </svg> 
-                                                                            </button>` : '';
-
-                            htmlString += userInfo.userType != null && userInfo.userType == 'admin' ? ` <button class="read-more delete"  onClick="deleteThisBlog('${data[i].id}')">
-                                                                                <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                    <path d="M9.89214 0L5.5 3.99286L1.10786 0L0 1.00714L4.39214 5L0 8.99286L1.10786 10L5.5 6.00714L9.89214 10L11 8.99286L6.60786 5L11 1.00714L9.89214 0Z" fill="white"/>
-                                                                                </svg>
-                                                                            </button>` : '';
-                      
-                         }
-
-                        htmlString += ` <button class="read-more" blog-id="${data[i].id}" onclick = "readThisBlog(this)">Read more</button>
-                        </div>
-                    </div>
-                </div> 
-                `; 
-            }
-            htmlString +=`<div class="more" >
-                            <button class="browse-more" id="next-for-new-blog" onclick="displayBlog(3)" >Browse more blog</button>
-                        </div>`;
-            bloglist.innerHTML= htmlString;
-        }        
-        else{
-            showNotification(`!`,'No blogs found','success');
-        }
-        removeNotification();
-    });
-}
-
-// removing function
+0
+/* ============= Start: Deleting a blog  ======================= */
+var removeNot = null;
+var blogIdToDelete = '';
 const deleteThisBlog = (blogId) => {
-    var query =database.ref('Blogs').orderByChild('id').limitToFirst(1).equalTo(blogId);
-    query.once("value", function(snapshot) {
-        console.log(snapshot.val());
-        snapshot.forEach(function(child) {
-            child.ref.remove();
-            fetchBlogs();
-        })
-    })     
+    blogIdToDelete = blogId;
+    removeNot = showNotification(`<i class="fas fa-bell"></i>`,`
+
+    <div style="margin-button:90px" >
+        <span> Click confirm to delete or close to close it </span>
+    </div>
+
+    <button class="read-more delete"  onClick="deleteBlog()">
+        <i class="fas fa-check"></i>
+    </button>
     
+    <button class="read-more update" onClick="closeNotification()">
+        <i class="fas fa-close"></i>
+    </button>
+
+    `,'error' , 'noEnd');
+   
 }
+/* =============== End: Deleting a blog ======================= */
 
-
-
+/* ============= Start: Updating a blog  ====================== */
 const updateThisBlog = (blogId) => {
     localStorage.setItem("blogId",blogId);
-    location.href = './blogupdate.html';    
+    location.href = `./blogupdate.html`;    
+}
+/* ============= End: Updating a blog  ======================= */
+
+/* ============== start:: Close ============================== */
+const closeNotification = () => {
+    removeNot(); 
+}
+/* ================ end:: Close ============================= */
+
+const deleteBlog =  () => {
+    fetch(`${baseUrl}api/v1/blogs/delete/${blogIdToDelete}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+            'Content-Type' : 'application/json',
+            'auth-token' : token
+        }
+    })
+    .then( (response) => {
+        if(response.ok){
+            return response.json();
+        }
+        else{
+            return Promise.reject(response);
+        }
+    })
+    .then((response) => {
+        removeNot(); 
+        showNotification(` <i class="fas fa-check"></i>`,`
+                <div style="margin-button:90px" >
+                    <span>Blog have been deleted </span>
+                </div>
+            `,'success');
+        displayBlog();
+        localtion.reload();
+    })
+    .catch((error) => {
+        removeNot(); 
+        showNotification(` <i class="fas fa-check"></i>`,`
+        <div style="margin-button:90px" >
+            <span>Please try again</span>
+        </div>
+    `,'success');
+        displayBlog();
+    })
 }

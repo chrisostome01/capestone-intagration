@@ -1,12 +1,8 @@
 
-/* Initialize Database  */
-const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
-
 // send user back to browse if he or she did not provide blog
-const blogId = localStorage.getItem('blogId');
+var blogId = localStorage.getItem('blogId');
 blogId == null ? location.href = './browse.html' : '' ;
-
+var interval = 6; 
 /* ===================== Start:: Folding blog function ============================ */
 const folder = document.getElementById('folder');
 folder.addEventListener('click',() =>{
@@ -19,200 +15,33 @@ folder.addEventListener('click',() =>{
 /* == Start::removing useful elemnt if user is not logged in */
 elementLeader();
 /* == End:: removing useful elemnt if user is not logged in */
-// usefull valiable
-var limitInterval = 2 ;
-var addToInterVal = 3 ;
-/* =====Start Getting Db ref ======= */
-const Blogs = database.ref('Blogs');
-/* =====End Getting Db ref ======= */
 
-/*  ====================== Start:: Getting selected blog information ============= */
-const gettingSelectBogData = (blogIdSent) => {
-    const query = Blogs.orderByChild('id').limitToFirst(1).equalTo(blogIdSent);
-    var blogReadingSide = document.getElementById('blog-reading-side');
-    var htmlInfo = '';
-    query.on("value", function(snapshot) {
-        var data = snapshot.val();   
-        for(var i in data){           
-            htmlInfo += `
-            <div class="top-banner">
-                <img src="${data[i].postBanner}" alt="" srcset="">
-            </div>
-            <div class="blog-text">
-                <div class="blog-read-header">
-                    <h3 class="leon">${data[i].Title}</h3>
-                </div>
-                <div class="blog-read-body">
-                    <span class="sub-title">
-                        <p>
-                        ${data[i].Subtitle}
-                        </p>
-                    </span>
-                    <div class="discription" >
-                    ${data[i].info}
-                    </div>
-                </div>
-            </div>`;
-        if(userInfo != null ) 
-            htmlInfo += `<div class="voting">
-                            <div class="icons">
-                                <div class="up-vote">
-                                    <div class="up-vote-icon">
-                                        <img src="../assets/svgs/up-vote.svg" alt="" srcset="">                                                      
-                                    </div>
-                                    <div class="up-vote-counter">
-                                        <span>
-                                            12
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="divider">
-                                    <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
-                                    </svg>                                                    
-                                </div>
-                                <div class="down-vote">
-                                    <div class="down-vote-icon">
-                                        <img src="../assets/svgs/down-vote.svg" alt="">                                                                                                        
-                                    </div>
-                                    <div class="down-vote-counter">
-                                        <span>
-                                            12
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="divider">
-                                    <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
-                                    </svg>                                                    
-                                </div>
-                                <div class="comment">
-                                    <div class="comment-icon" id="commentbtn" >
-                                        <img src="../assets/svgs/comment.svg" alt="" srcset="">                                                                                                             
-                                    </div>
-                                    <div class="comment-counter">
-                                        <span>
-                                            05
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
 
-            }
-        blogReadingSide.innerHTML = htmlInfo;
-    })  
-}
-// gettingSelectBogData(blogId);
-/*  ====================== End:: Getting selected blog information =============== */
 
-/* =======================Start::  Getting summary Blog info ============= */
-const gettingSummaryBlog = (limitiParam = null) => {
-    var limitValues = limitiParam != null ? limitInterval : limitInterval + 1 ;
-    var query = Blogs.limitToLast(limitValues);
-    var blogSide = document.getElementById('blog-side');
-    query.on('value' , (snapshot) => {
-        var htmlInfo = '' ;
-        if(snapshot.exists()){
-            var data = snapshot.val();
-            for(var i in data){
-                htmlInfo += `
-                <div class="blog-card" onclick="revealNewBlog('${data[i].id}')" >
-                    <div class="blog-summary-content">
-                        <div class="blog-image-banner">
-                        <img src="${data[i].postBanner}" alt="" />
-                        </div>
-                        <div class="blog-content-s">
-                            <h3 class="leon">${data[i].Title}</h3>
-                            <span class="sub-title">
-                                <p>
-                                    ${data[i].Subtitle}
-                                </p>
-                            </span>
-                            <div class="blog-info">
-                                <p>
-                                    ${data[i].info}
-                                </p>                                       
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `;
-            }
-            htmlInfo += `
-            <div class="next-card">
-                <div class="icon-next">
-                    <img src="../assets/svgs/next-icon.svg" alt="" srcset="">     
-                </div>
-            </div>      
-            <div class="next-card-w">
-                <div class="icon-next-w">
-                    <img src="../assets/svgs/next-icon-w.svg" alt="" srcset="">     
-                </div>
-            </div> 
-            `;
-            blogSide.innerHTML = htmlInfo;
-
-        }
-    })
-}
-gettingSummaryBlog();
-/* =======================End::  Getting summary Blog info =============== */
-/* =======================Start::  Select Blog =========================== */
-const revealNewBlog = (newBlogId) => {
-    gettingSelectBogData(newBlogId);
-}
-/* =======================Start::  Select Blog =========================== */
-//Implimanting commenting
-
-const commentBtn = document.getElementById('commentbtn');
-commentBtn != null ? 
-    commentBtn.addEventListener('click' , () => {
-        const commentingSection = document.getElementById('commenting-section');     
-        commentingSection.classList.toggle('hidden-comment');
-    })
-: '';
-
-const postBtn = document.getElementById('post-comment');
-postBtn != null ?
-    postBtn.addEventListener('click' , () => {
-        const commentInfo = isEmpty('commenting-area' , 'Comment');
-        // getting date 
-        const today = new Date();
-        const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate() + " " + today.getHours() + ":" + today.getMinutes() ;
-
-        if(commentInfo.pass){
-            const commentTable = database.ref('Comments');
-            const uniqueId = commentTable.push().key;
-            if(userInfo != null){
-                commentTable.push().set({
-                    "id": uniqueId,
-                    "userId":userInfo.id,
-                    "commentedOn":blogId,
-                    "comment":commentInfo.value,
-                    "commentedDate":date
-                })
-                .then(() => {
-                    showNotification('!','Your comment have been posted','success');
-                    document.getElementById('commenting-area').value = '';
-                })
-                .catch((error) =>{
-                    showNotification('!','Please try to make sure you are connected to the internet and try again','error');
-                })
-            }
-        }
-        addToInterVal += 1;
-        getComment();
-    })
-: '';
-
-var moreComent = document.getElementById('moreComment');
 const getComment = (addTo = null) =>{
-    const commentDetail = document.getElementById('comment-details-section');
-    const commentTable = database.ref('Comments');
-    const userTable = database.ref('users');
-    const query  = commentTable.orderByChild('commentedOn').limitToFirst(addToInterVal).equalTo(blogId);
-    var htmlInfo = `
+   
+    var commentSection = document.getElementById('comment-details-section');
+    var commentInfo = '';
+    console.log(commentSection);
+    fetch(`${baseUrl}api/v1/comments?limit=${commentInteval}&q=${blogId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        
+        if(response.status == 200){
+            return response.json();  
+        }     
+        else{
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        var htmlInfo = `
         <div class="commenters-details">
             <div class="user-comment">       
                 <div class="user-comment-info ">
@@ -223,57 +52,335 @@ const getComment = (addTo = null) =>{
             </div>
             <div class="comment-divider"></div>
         </div>`;
-        
-    query.on('value', (snap) =>{
-        let data = snap.val();
-        if(snap.exists()){
-            htmlInfo = ``;
-            
-            for(let i in data){
-                const commentedByQuery  = userTable.orderByChild('id').limitToFirst(1).equalTo(data[i].userId);
-                var commenterUsername = '';
-                var commenterProfile = '';
-                commentedByQuery.on('value' , (snap) =>{
-                    const userData = snap.val();
-                   
-                    for(let i in userData){
-                        commenterUsername = userData[i].Username;
-                        commenterProfile = userData[i].profile;
+
+        if(data){
+            htmlInfo = ''
+            data.forEach(value => {
+                fetch(`${baseUrl}api/v1/user/find/${value.userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token': token
                     }
+                })
+                .then( (response) => {                  
+                    return response.json();                    
+                })
+                .then((response) => {
+                    let commenterData = response.data;
+                    let commenterProfile  = commenterData.profile;
                     htmlInfo +=`
                     <div class="commenters-details">
                         <div class="user-comment">
                             <div class="user-profile">
-                                <img src="${commenterProfile}" id="profile"  alt="sezerano">
+                                <img src="${commenterProfile ? commenterProfile : '../assets/images/profile.png'}" id="profile"  alt="sezerano">
                             </div>
                             <div class="user-comment-info">
-                                <p class="leon" > ${commenterUsername}</p>
+                                <p class="leon" >${commenterData.Fullname}</p>
                                 <div class="comment-words">
-                                   ${data[i].comment}
+                                   ${value.comment}
                                 </div>
                             </div>
                         </div>                     
                         <div class="comment-divider"></div>
                     </div>
                     `;
-                    moreComent.innerHTML = 'Get more comments';
-                }) 
-                
-               
-            }
-            commentDetail.innerHTML = htmlInfo;
-            moreComent.innerHTML = 'Get more comments';
-        }
-        else{
-            moreComent.remove();
-            commentDetail.innerHTML = htmlInfo;
+                    commentSection.innerHTML = htmlInfo;
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            });
+            
         }
         
-    })
+        
+    }).catch(function (err) {     
+       showNotification('<i class="fas fa-bell"></i>',err.statusText,'error');
+    });
+
+
 }
 
-getComment();
-moreComent.addEventListener('click' , () => {
-    addToInterVal += 1 ;
+
+
+// usefull valiable
+var limitInterval = 3 ;
+var addToInterVal = 3 ;
+var commentInteval = 2;
+var moreComent = null;
+/*  ====================== Start:: Getting selected blog information ============= */
+const gettingSelectBogData = (blogIdSent) => {
+
+    var blogDisplay = document.getElementById('blog-reading-side');
+    var dataPlacer = ` `;
+    fetch(`${baseUrl}api/v1/blogs/find?blogId=${blogIdSent}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        data.forEach(value => {
+                   
+                dataPlacer += `
+                <div class="top-banner">
+                    <img src="${value.postBanner}" alt="" srcset="">
+                </div>
+                <div class="blog-text">
+                    <div class="blog-read-header">
+                        <h3 class="leon">${value.Title}</h3>
+                    </div>
+                    <div class="blog-read-body">
+                        <span class="sub-title">
+                            <p>
+                            ${value.Subtitle}
+                            </p>
+                        </span>
+                        <div class="discription" >
+                        ${value.info}
+                        </div>
+                    </div>
+                </div>`;
+            if(userInfo != null ) 
+                dataPlacer += `<div class="voting">
+                                <div class="icons">
+                                    <div class="up-vote">
+                                        <div class="up-vote-icon">
+                                            <img src="../assets/svgs/up-vote.svg" alt="" srcset="">                                                      
+                                        </div>
+                                        <div class="up-vote-counter">
+                                            <span>
+                                                12
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="divider">
+                                        <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
+                                        </svg>                                                    
+                                    </div>
+                                    <div class="down-vote">
+                                        <div class="down-vote-icon">
+                                            <img src="../assets/svgs/down-vote.svg" alt="">                                                                                                        
+                                        </div>
+                                        <div class="down-vote-counter">
+                                            <span>
+                                                12
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="divider">
+                                        <svg width="2" height="36" viewBox="0 0 2 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 0V36" stroke="black" stroke-opacity="0.33" stroke-width="2"/>
+                                        </svg>                                                    
+                                    </div>
+                                    <div class="comment" onclick="commentHub()" >
+                                        <div class="comment-icon" id="commentbtn" >
+                                            <img src="../assets/svgs/comment.svg" alt="" srcset="">                                                                                                             
+                                        </div>
+                                        <div class="comment-counter">
+                                            <span>
+                                                05
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            
+        });
+        dataPlacer += `
+        <div class="comments-class hidden-comment" id="commenting-section"> 
+            <div class="comment-information" id="comment-details-section">
+            
+            </div>  
+            <div class="link" > <p class="lean"  id="moreComment" onclick="getMoreComment()" > Get comments</p> </div>
+            <div class="send-comment" id="comment-form">
+               `;
+            if(userInfo == null ) 
+                dataPlacer += `
+                <div class="link" > <p class="lean"  id="moreComment"><br> Inorder to be commenting you need to be logged in</p> </div>
+                `;
+            if(userInfo != null )
+                dataPlacer += `
+                    <div class="postComment" action="#" method="post"> 
+                        <div class="input-field">
+                            <textarea name="comment" id="commenting-area" placeholder="Comment" cols="30" rows="10"></textarea>
+                        </div>
+                        <div class="input-field">
+                            <div class="send">
+                                <button type="submit" id="post-comment" onclick="enableComment()" >Post</button>
+                            </div>
+                        </div> 
+                    </div>
+                `;
+
+        dataPlacer += `
+                    </div>                         
+                </div>`;
+        blogDisplay.innerHTML = dataPlacer;
+        // removeNotification();
+    }).catch(function (err) {
+        // removeNotification();
+        console.warn('Something went wrong.', err);
+    });
+}
+gettingSelectBogData(blogId);
+/*  ====================== End:: Getting selected blog information =============== */
+
+/* =======================Start::  Getting summary Blog info ============= */
+const gettingSummaryBlog = (limitiParam = null) => {
     getComment();
+    let limit = limitiParam === null ? interval : interval + limitiParam; 
+    interval = limit; 
+    const removeNotification = showNotification(`<i class="fas fa-bell"></i>`,'Fetching more blogs','success','noEnd');
+  
+
+    var blogDisplay = document.getElementById('blog-side');
+    var dataPlacer = ` `;
+    fetch(`${baseUrl}api/v1/blogs?limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrer: 'no-referrer'
+    })
+    .then(function (response) {
+        if(response.status == 200){
+            return response.json();  
+        }     
+        else{
+            return Promise.reject(response);
+        }
+    })
+    .then(function (response) {
+        let data = response.data;
+        if(data){
+            data.forEach(value => {
+                dataPlacer += `
+                <div class="blog-card" onclick="revealNewBlog('${value._id}')" >
+                    <div class="blog-summary-content">
+                        <div class="blog-image-banner">
+                        <img src="${value.postBanner}" alt="" />
+                        </div>
+                        <div class="blog-content-s">
+                            <h3 class="leon">${value.Title}</h3>
+                            <span class="sub-title">
+                                <p>
+                                    ${value.Subtitle}
+                                </p>
+                            </span>
+                            <div class="blog-info">
+                                <p>
+                                    ${value.info}
+                                </p>                                       
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            dataPlacer += `
+            <div class="next-card">
+                <div class="icon-next" onClick="gettingSummaryBlog(2)">
+                    <img src="../assets/svgs/next-icon.svg" alt="" srcset="">     
+                </div>
+            </div>      
+            <div class="next-card-w">
+                <div class="icon-next-w" onClick="gettingSummaryBlog(2)">
+                    <img src="../assets/svgs/next-icon-w.svg" alt="" srcset="">     
+                </div>
+            </div> 
+            `;
+           
+            blogDisplay.innerHTML = dataPlacer;
+        }
+        
+        removeNotification();
+    }).catch(function (err) {
+        removeNotification();
+        console.warn( err);
+    });
+}
+gettingSummaryBlog();
+/* =======================End::  Getting summary Blog info =============== */
+/* =======================Start::  Select Blog =========================== */
+const revealNewBlog = (newBlogId) => {
+    localStorage.setItem('blogId',newBlogId);
+    blogId = localStorage.getItem('blogId');
+    gettingSelectBogData(newBlogId);
+}
+/* =======================Start::  Select Blog =========================== */
+//Implimanting commenting
+
+
+const commentHub = () => {
+    const commentingSection = document.getElementById('commenting-section');
+    commentingSection.classList.toggle('hidden-comment');        
+    getComment();
+}
+
+const enableComment = () => {
+    
+var postBtn = document.getElementById('post-comment');
+postBtn.addEventListener('click' , () => {
+    const commentInfo = isEmpty('commenting-area' , 'Comment');
+    // getting date 
+    const today = new Date();
+    const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate() + " " + today.getHours() + ":" + today.getMinutes() ;
+    const removeNotification = showNotification(`<i class="fas fa-laugh"></i>`,'Creating your comments','success','noEnd');
+    /* ============= Start:: Creating a comment =============== */    
+        fetch(`${baseUrl}api/v1/comments/create`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': token
+            },
+            body: JSON.stringify({
+                "comment" :commentInfo.value,
+                "blogId" : blogId
+            })
+        })
+        .then(function (response) {
+            removeNotification();
+            if (response.ok) {
+                return response.json();
+            } else {
+                return Promise.reject(response);
+            }
+        })
+        .then(function (response) {            
+            let token = response.data.token;
+            showNotification(`<i class="fas fa-laugh"></i>`,`Comments created`,'success');
+        })
+        .catch(function (err) {    
+            if(err.status == 401 ){
+                showNotification(`<i class="fas fa-exclamation-circle"></i>`,`Please login`,'error');
+            }
+            if(err.status == 404 ){
+                showNotification(`<i class="fas fa-exclamation-circle"></i>`,`Make sure you all comment is not empty`,'error');
+            }
+        });
+    /* ============== End:: Creating a comment ================ */    
+  
+    commentInteval++;
+    gettingSelectBogData(blogId);
 })
+}
+
+
+
+const getMoreComment = () => {
+    commentInteval++;
+    getComment();
+}

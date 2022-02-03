@@ -1,4 +1,4 @@
-logout();
+amLoggedin();
 login.addEventListener('submit',(e)=>{
    
     e.preventDefault();
@@ -7,32 +7,43 @@ login.addEventListener('submit',(e)=>{
     let password = document.getElementById('password').value;    
     if(isLoginInputValid.emailIsValid && isLoginInputValid.passwordIsValid){
         const removeNotification = showNotification(`!`,'Fetching your account information','success','noEnd');
-        var userInfo = {};
-       
-        auth.signInWithEmailAndPassword(email,password)
-        .then(Credentials => {
-            userTable.once("value", snap => {
-                removeNotification();
-                let userRecord = snap.val();
-                // console.log('returned record' , userRecord);
-                /* keeping user info in localstorage */ 
-                for(var i in userRecord){
-                    console.log(userRecord[i]);
-                    if(userRecord[i].Email == email ){
-                        localStorage.setItem("userInfo",JSON.stringify(userRecord[i]));
-                        location.href  = './browse.html';
-                    }
+        /* ============= Start:: User Logging =============== */    
+            fetch(`${baseUrl}api/v1/user/login`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "Email": email,
+                    "Password": password
+                })
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return Promise.reject(response);
                 }
             })
-            
-            login.reset();
-            
-        })
-        .catch(error => {
-            removeNotification();
-            showNotification(`!`,error.code.split('/')[1].replace('-',' '),'error');       
-            login.reset();   
-        })     
+            .then(function (response) {
+                removeNotification();
+                let token = response.data.token;
+                showNotification(`!`,`You are now logged in`,'success');
+                localStorage.setItem("token",token);
+                location.href  = './browse.html';
+            })
+            .catch(function (err) {
+                removeNotification();
+                if(err.status == 401 ){
+                    showNotification(`!`,`Invalid credentials`,'error');
+                }
+                if(err.status == 404 ){
+                    showNotification(`!`,`Make sure you all inputs are valid`,'error');
+                }
+            });
+        /* ============== End:: User Logging ================ */    
+       
     }
     else{
         showNotification(`!`,'Please make sure all field are not empty','error');     
@@ -41,7 +52,7 @@ login.addEventListener('submit',(e)=>{
   
 })
 
-const logInGoogle = document.getElementById('with-g');
+const logInGoogle = document.getElementById('with-gkk');
 logInGoogle.addEventListener('click',()=>{
     hidePassword();
     const removeNotification = showNotification(`!`,'Proccesing information','success','noEnd');
@@ -49,7 +60,7 @@ logInGoogle.addEventListener('click',()=>{
     auth.signInWithPopup(googleProvider)
     .then((result) => {
         const user = result.user;
-        if (result.credential) {                    
+        if (result.credential) {
             var credential = result.credential;
             var token = credential.accessToken;
         } 
